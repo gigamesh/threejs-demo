@@ -7,8 +7,7 @@ const THREE = require("three");
 class App extends Component {
   state = {
     mouseX: 0,
-    mouseY: 0,
-    wireframe: false
+    mouseY: 0
   };
 
   componentDidMount() {
@@ -30,62 +29,55 @@ class App extends Component {
     this.scene = new THREE.Scene();
     const scene = this.scene;
 
-    const light1 = new THREE.AmbientLight(0x85c210, 1.5);
-    scene.add(light1);
-    this.light2 = new THREE.PointLight(0x22ffffff, 0.5, 0, 2);
+    const overHeadLight = new THREE.HemisphereLight(0xffffff, 0x000000, 1.5);
+    scene.add(overHeadLight);
+    this.light2 = new THREE.PointLight(0xff0000, 0, 0, 2);
     const light2 = this.light2;
     scene.add(light2);
-    const light3 = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
-    // light3.position.set(50, 100, 1000);
-    scene.add(light3);
 
-    const loader = new THREE.FontLoader();
-    const font = loader.parse(fontJSON);
+    const fontLoader = new THREE.FontLoader();
+    const font = fontLoader.parse(fontJSON);
+
+    const textureloader = new THREE.CubeTextureLoader();
+    const textureCube = textureloader.load([
+      "assets/img/pos-x.png",
+      "assets/img/neg-x.png",
+      "assets/img/pos-y.png",
+      "assets/img/neg-y.png",
+      "assets/img/pos-z.png",
+      "assets/img/neg-z.png"
+    ]);
+
+    textureCube.format = THREE.RGBFormat;
 
     const geometry = new THREE.TextGeometry("HOUSE OF MOVES", {
       font,
-      size: 40,
+      size: 50,
       height: 20,
-      bevelThickness: 20,
-      material: 10
+      bevelThickness: 0,
+      material: 20
     });
 
     geometry.translate(-250, 0, 0);
-    // geometry.rotateY(0.25);
+    // geometry.rotateY(0.2);
     geometry.rotateX(-0.2);
     // geometry.rotateZ(0.5);
-    this.material = new THREE.MeshStandardMaterial({
-      color: 0x6ebf42,
-      // emissive: 0x0b3307,
-      // emissiveIntensity: 0.1,
-      metalness: 0.5,
-      roughness: 0.5,
-      wireframe: false
+
+    this.material = new THREE.MeshPhysicalMaterial({
+      color: 0xdddddd,
+      metalness: 0.6,
+      roughness: 0.2,
+      reflectivity: 0.8,
+      envMap: textureCube,
+      envMapIntensity: 1.3
     });
     this.mesh = new THREE.Mesh(geometry, this.material);
-    const mesh = this.mesh;
-    mesh.position.set(0, 0, -500);
+    this.mesh.position.set(0, 0, -700);
 
-    scene.add(mesh);
+    scene.add(this.mesh);
 
     requestAnimationFrame(this.animate);
-
-    this.glitchTimer = setInterval(this.glitch, 5000);
   }
-
-  glitch = () => {
-    this.material.wireframe = true;
-    setTimeout(() => {
-      this.material.wireframe = false;
-      setTimeout(() => {
-        this.material.wireframe = true;
-        setTimeout(() => {
-          this.material.wireframe = false;
-        }, 50);
-      }, 50);
-    }, 50);
-  };
-
   delta = 0;
   animate = () => {
     let wave = Math.sin((this.delta += 0.01));
@@ -110,6 +102,7 @@ class App extends Component {
   render() {
     return (
       <canvas ref={el => (this.canvas = el)} onMouseMove={this.mouseMove} />
+      // <img src="assets/img/LA-xlarge.jpg" />
     );
   }
 }

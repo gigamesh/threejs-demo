@@ -7,8 +7,10 @@ const THREE = require("three");
 class App extends Component {
   state = {
     mouseX: 0,
-    mouseY: 0
+    mouseY: 0,
+    wireframe: false
   };
+
   componentDidMount() {
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -28,13 +30,13 @@ class App extends Component {
     this.scene = new THREE.Scene();
     const scene = this.scene;
 
-    const light1 = new THREE.AmbientLight(0x85c210, 2);
+    const light1 = new THREE.AmbientLight(0x85c210, 1.5);
     scene.add(light1);
-    this.light2 = new THREE.PointLight(0x22ffffff, 0.3, 0, 2);
+    this.light2 = new THREE.PointLight(0x22ffffff, 0.5, 0, 2);
     const light2 = this.light2;
     scene.add(light2);
-    const light3 = new THREE.PointLight(0xffffff, 0.2, -0.5, 2);
-    light3.position.set(50, -100, 800);
+    const light3 = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
+    // light3.position.set(50, 100, 1000);
     scene.add(light3);
 
     const loader = new THREE.FontLoader();
@@ -48,25 +50,41 @@ class App extends Component {
       material: 10
     });
 
-    // const geometry = new THREE.TorusKnotGeometry(80, 25, 150, 150);
     geometry.translate(-250, 0, 0);
-    // geometry.rotateY(0.5);
+    // geometry.rotateY(0.25);
+    geometry.rotateX(-0.2);
     // geometry.rotateZ(0.5);
-    const material = new THREE.MeshStandardMaterial({
+    this.material = new THREE.MeshStandardMaterial({
       color: 0x6ebf42,
       // emissive: 0x0b3307,
       // emissiveIntensity: 0.1,
       metalness: 0.5,
-      roughness: 0.4
+      roughness: 0.5,
+      wireframe: false
     });
-    this.mesh = new THREE.Mesh(geometry, material);
+    this.mesh = new THREE.Mesh(geometry, this.material);
     const mesh = this.mesh;
     mesh.position.set(0, 0, -500);
 
     scene.add(mesh);
 
     requestAnimationFrame(this.animate);
+
+    this.glitchTimer = setInterval(this.glitch, 5000);
   }
+
+  glitch = () => {
+    this.material.wireframe = true;
+    setTimeout(() => {
+      this.material.wireframe = false;
+      setTimeout(() => {
+        this.material.wireframe = true;
+        setTimeout(() => {
+          this.material.wireframe = false;
+        }, 50);
+      }, 50);
+    }, 50);
+  };
 
   delta = 0;
   animate = () => {

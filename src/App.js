@@ -64,7 +64,7 @@ class App extends Component {
     // geometry.rotateZ(0.5);
 
     this.material = new THREE.MeshPhysicalMaterial({
-      color: 0xdddddd,
+      color: 0xeae57e,
       metalness: 0.6,
       roughness: 0.2,
       reflectivity: 0.8,

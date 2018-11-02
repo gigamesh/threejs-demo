@@ -28,11 +28,14 @@ class App extends Component {
     this.scene = new THREE.Scene();
     const scene = this.scene;
 
-    const light1 = new THREE.AmbientLight(0x85c210, 0.9);
+    const light1 = new THREE.AmbientLight(0x85c210, 2);
     scene.add(light1);
-    this.light2 = new THREE.PointLight(0xffffff, 0.6);
+    this.light2 = new THREE.PointLight(0x22ffffff, 0.3, 0, 2);
     const light2 = this.light2;
     scene.add(light2);
+    const light3 = new THREE.PointLight(0xffffff, 0.2, -0.5, 2);
+    light3.position.set(50, -100, 800);
+    scene.add(light3);
 
     const loader = new THREE.FontLoader();
     const font = loader.parse(fontJSON);
@@ -41,7 +44,7 @@ class App extends Component {
       font,
       size: 40,
       height: 20,
-      bevelThickness: 1,
+      bevelThickness: 20,
       material: 10
     });
 
@@ -49,9 +52,12 @@ class App extends Component {
     geometry.translate(-250, 0, 0);
     // geometry.rotateY(0.5);
     // geometry.rotateZ(0.5);
-    const material = new THREE.MeshPhongMaterial({
-      color: 0xdbefb3
-      // emissive: 0x00ff00
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x6ebf42,
+      // emissive: 0x0b3307,
+      // emissiveIntensity: 0.1,
+      metalness: 0.5,
+      roughness: 0.4
     });
     this.mesh = new THREE.Mesh(geometry, material);
     const mesh = this.mesh;
@@ -66,7 +72,11 @@ class App extends Component {
   animate = () => {
     let wave = Math.sin((this.delta += 0.01));
     this.mesh.rotation.y += wave * 0.001;
-    this.light2.position.set(this.state.mouseX - 500, this.state.mouseY, -100);
+    this.light2.position.set(
+      this.state.mouseX - 800,
+      this.state.mouseY - 300,
+      -100
+    );
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.animate);
   };

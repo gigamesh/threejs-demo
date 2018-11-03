@@ -1,14 +1,15 @@
 import React, { Component } from "react";
 import "./App.css";
 
-const fontJSON = require("./helvetiker_bold.typeface.json");
-const THREE = require("three");
+var THREE = (window.THREE = require("three"));
+require("three/examples/js/loaders/SVGLoader");
 
 class App extends Component {
   state = {
     mouseX: 0,
     mouseY: 0,
-    wireframe: false
+    wireframe: false,
+    changeMe: 0
   };
 
   componentDidMount() {
@@ -30,10 +31,15 @@ class App extends Component {
       0.1,
       3000
     );
+    this.camera.position.set(0, 0, 200);
 
     ////////////////// SCENE
     this.scene = new THREE.Scene();
     const scene = this.scene;
+
+    const helper = new THREE.GridHelper(160, 10);
+    helper.rotation.x = Math.PI / 2;
+    scene.add(helper);
 
     const light1 = new THREE.AmbientLight(0x85c210, 1.5);
     scene.add(light1);
@@ -44,10 +50,41 @@ class App extends Component {
     scene.add(light3);
 
     ////////////////// LOADER
+
     const loader = new THREE.SVGLoader();
     loader.load(
-      "assets/svg/Hom_logo3a.svg",
-      createGeometry,
+      "assets/svg/tiger.svg",
+      paths => {
+        const group = new THREE.Group();
+        group.scale.multiplyScalar(0.25);
+        group.position.x = -70;
+        group.position.y = -70;
+        group.scale.y *= -1;
+
+        for (let i = 0; i < paths.length; i++) {
+          const path = paths[i];
+
+          const material = new THREE.MeshStandardMaterial({
+            color: path.color,
+            // color: 0xffffff,
+            side: THREE.DoubleSide,
+            depthWrite: false
+            // metalness: 0.5,
+            // roughness: 0.5
+          });
+
+          const shapes = path.toShapes(true);
+
+          for (let j = 0; j < shapes.length; j++) {
+            const shape = shapes[j];
+            const geometry = new THREE.ShapeBufferGeometry(shape);
+            const mesh = new THREE.Mesh(geometry, material);
+            group.add(mesh);
+          }
+        }
+
+        scene.add(group);
+      },
       xhr => {
         console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
       },
@@ -55,61 +92,6 @@ class App extends Component {
         console.log("An error happened");
       }
     );
-
-    ///////////////// GEOMETRY
-
-    const createGeometry = paths => {
-      const group = new THREE.Group();
-
-      for (let i = 0; i < paths.length; i++) {
-        const path = paths[i];
-
-        const material = new THREE.MeshStandardMaterial({
-          color: 0xffffff,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-          metalness: 0.5,
-          roughness: 0.5
-        });
-
-        const shapes = path.toShapes(true);
-
-        for (let j = 0; j < shapes.length; j++) {
-          const shape = shapes[j];
-          const geometry = new THREE.ShapeBufferGeometry(shape);
-          const mesh = new THREE.Mesh(geometry, material);
-          group.add(mesh);
-        }
-      }
-
-      scene.add(group);
-    };
-    // const geometry = new THREE.TextGeometry("HOUSE OF MOVES", {
-    //   font,
-    //   size: 40,
-    //   height: 20,
-    //   bevelThickness: 20,
-    //   material: 10
-    // });
-
-    // geometry.translate(-250, 0, 0);
-    // geometry.rotateX(-0.2);
-    // this.material = new THREE.MeshStandardMaterial({
-    //   color: 0x6ebf42,
-    //   // emissive: 0x0b3307,
-    //   // emissiveIntensity: 0.1,
-    //   metalness: 0.5,
-    //   roughness: 0.5,
-    //   wireframe: false
-    // });
-
-    ///////////////// MESH
-    // this.mesh = new THREE.Mesh(geometry, this.material);
-    // const mesh = this.mesh;
-    // mesh.position.set(0, 0, -500);
-
-    // scene.add(mesh);
-
     requestAnimationFrame(this.animate);
 
     // this.glitchTimer = setInterval(this.glitch, 4000);

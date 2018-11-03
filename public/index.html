@@ -27,7 +27,10 @@
   <noscript>
     You need to enable JavaScript to run this app.
   </noscript>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/98/three.min.js"></script>
+  <script src="https://threejs.org/examples/js/loaders/SVGLoader.js"></script>
   <div id="root"></div>
+  <div id="container"></div>
   <!-- <div>y</div> -->
   <!--
       This HTML file is a template.
@@ -39,7 +42,89 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/98/three.min.js"></script> -->
+
+  <script>
+    ////////////////// RENDERER
+    const container = document.getElementById('container')
+
+
+    ////////////////// CAMERA
+    const camera = new THREE.PerspectiveCamera(
+      35,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      3000
+    );
+    camera.position.set(0, 0, 200);
+
+    ////////////////// SCENE
+    const scene = new THREE.Scene();
+
+    const helper = new THREE.GridHelper(160, 10);
+    helper.rotation.x = Math.PI / 2;
+    scene.add(helper);
+
+    const light1 = new THREE.AmbientLight(0x85c210, 1.5);
+    scene.add(light1);
+    light2 = new THREE.PointLight(0xffffff, 0.4, 0, 2);
+    scene.add(light2);
+    const light3 = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
+    scene.add(light3);
+
+    ////////////////// LOADER
+
+    const loader = new THREE.SVGLoader();
+    loader.load(
+      "assets/svg/tiger.svg",
+      paths => {
+        // console.log(paths)
+        const group = new THREE.Group();
+        group.scale.multiplyScalar(0.25);
+        group.position.x = -70;
+        group.position.y = -70;
+        group.scale.y *= -1;
+
+        for (let i = 0; i < paths.length; i++) {
+          const path = paths[i];
+
+          const material = new THREE.MeshStandardMaterial({
+            color: path.color,
+            // color: 0xffffff,
+            side: THREE.DoubleSide,
+            depthWrite: false
+            // metalness: 0.5,
+            // roughness: 0.5
+          });
+
+          const shapes = path.toShapes(true);
+
+          for (let j = 0; j < shapes.length; j++) {
+            const shape = shapes[j];
+            const geometry = new THREE.ShapeBufferGeometry(shape);
+            const mesh = new THREE.Mesh(geometry, material);
+            group.add(mesh);
+          }
+        }
+
+        scene.add(group);
+      },
+      xhr => {
+        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      },
+      error => {
+        console.log("An error happened");
+      }
+    )
+
+    renderer = new THREE.WebGLRenderer({
+      antialias: true
+    });
+
+    renderer.setClearColor(0xffffff);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement)
+  </script>
 </body>
 
 </html>

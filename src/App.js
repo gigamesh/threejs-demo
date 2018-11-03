@@ -5,113 +5,103 @@ var THREE = (window.THREE = require("three"));
 require("three/examples/js/loaders/SVGLoader");
 
 class App extends Component {
-  state = {
-    mouseX: 0,
-    mouseY: 0,
-    wireframe: false,
-    changeMe: 0
-  };
+  constructor() {
+    this.scene = new THREE.Scene();
+  }
 
   componentDidMount() {
-    ////////////////// RENDERER
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas,
-      antialias: true
-    });
+    this.init();
+    this.animate();
+  }
+  //
 
-    const renderer = this.renderer;
-    renderer.setClearColor(0xffffff);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+  init = () => {
+    //
 
-    ////////////////// CAMERA
+    this.scene.background = new THREE.Color(0xb0b0b0);
+
+    //
+
     this.camera = new THREE.PerspectiveCamera(
-      35,
+      50,
       window.innerWidth / window.innerHeight,
-      0.1,
-      3000
+      1,
+      1000
     );
     this.camera.position.set(0, 0, 200);
 
-    ////////////////// SCENE
-    this.scene = new THREE.Scene();
-    const scene = this.scene;
+    //
 
-    const helper = new THREE.GridHelper(160, 10);
+    var helper = new THREE.GridHelper(160, 10);
     helper.rotation.x = Math.PI / 2;
-    scene.add(helper);
+    this.scene.add(helper);
 
-    const light1 = new THREE.AmbientLight(0x85c210, 1.5);
-    scene.add(light1);
-    this.light2 = new THREE.PointLight(0xffffff, 0.4, 0, 2);
-    const light2 = this.light2;
-    scene.add(light2);
-    const light3 = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
-    scene.add(light3);
+    //
 
-    ////////////////// LOADER
+    var loader = new THREE.SVGLoader();
+    loader.load("assets/svg/Hom_logo3a.svg", function(paths) {
+      var group = new THREE.Group();
+      group.scale.multiplyScalar(0.25);
+      group.position.x = -70;
+      group.position.y = 70;
+      group.scale.y *= -1;
 
-    const loader = new THREE.SVGLoader();
-    loader.load(
-      "assets/svg/tiger.svg",
-      paths => {
-        const group = new THREE.Group();
-        group.scale.multiplyScalar(0.25);
-        group.position.x = -70;
-        group.position.y = -70;
-        group.scale.y *= -1;
+      for (var i = 0; i < paths.length; i++) {
+        var path = paths[i];
 
-        for (let i = 0; i < paths.length; i++) {
-          const path = paths[i];
+        var material = new THREE.MeshBasicMaterial({
+          color: path.color,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
 
-          const material = new THREE.MeshStandardMaterial({
-            color: path.color,
-            // color: 0xffffff,
-            side: THREE.DoubleSide,
-            depthWrite: false
-            // metalness: 0.5,
-            // roughness: 0.5
-          });
+        var shapes = path.toShapes(true);
 
-          const shapes = path.toShapes(true);
+        for (var j = 0; j < shapes.length; j++) {
+          var shape = shapes[j];
 
-          for (let j = 0; j < shapes.length; j++) {
-            const shape = shapes[j];
-            const geometry = new THREE.ShapeBufferGeometry(shape);
-            const mesh = new THREE.Mesh(geometry, material);
-            group.add(mesh);
-          }
+          var geometry = new THREE.ShapeBufferGeometry(shape);
+          var mesh = new THREE.Mesh(geometry, material);
+
+          group.add(mesh);
         }
-
-        scene.add(group);
-      },
-      xhr => {
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-      },
-      error => {
-        console.log("An error happened");
       }
-    );
-    requestAnimationFrame(this.animate);
 
-    // this.glitchTimer = setInterval(this.glitch, 4000);
-  }
+      this.scene.add(group);
+    });
 
-  animate = () => {
-    this.light2.position.set(
-      this.state.mouseX - 800,
-      this.state.mouseY - 300,
-      -100
-    );
-    this.renderer.render(this.scene, this.camera);
-    requestAnimationFrame(this.animate);
+    //
+
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+    window.addEventListener("resize", this.onWindowResize, false);
+
+    document.body.addEventListener("dblclick", function(event) {
+      var group = this.scene.children[1];
+      group.traverse(function(child) {
+        if (child.material)
+          child.material.wireframe = !child.material.wireframe;
+      });
+    });
   };
 
-  mouseMove = e => {
-    this.setState({
-      mouseX: e.nativeEvent.offsetX,
-      mouseY: e.nativeEvent.offsetY
-    });
+  onWindowResize = () => {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  };
+
+  animate = () => {
+    requestAnimationFrame(this.animate);
+
+    this.run();
+  };
+
+  run = () => {
+    this.renderer.render(this.scene, this.camera);
   };
 
   render() {

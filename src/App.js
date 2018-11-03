@@ -3,25 +3,20 @@ import "./App.css";
 
 var THREE = (window.THREE = require("three"));
 require("three/examples/js/loaders/SVGLoader");
+require("three/examples/js/controls/OrbitControls");
 
 class App extends Component {
-  constructor() {
-    this.scene = new THREE.Scene();
-  }
-
   componentDidMount() {
-    this.init();
-    this.animate();
-  }
-  //
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas,
+      antialias: true
+    });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-  init = () => {
-    //
+    window.addEventListener("resize", this.onWindowResize, false);
 
-    this.scene.background = new THREE.Color(0xb0b0b0);
-
-    //
-
+    //////////////CAMERA
     this.camera = new THREE.PerspectiveCamera(
       50,
       window.innerWidth / window.innerHeight,
@@ -30,53 +25,74 @@ class App extends Component {
     );
     this.camera.position.set(0, 0, 200);
 
-    //
+    ////////// SCENE
+    this.scene = new THREE.Scene();
+    const { scene } = this;
+    this.scene.background = new THREE.Color(0xf4f4e6);
 
-    var helper = new THREE.GridHelper(160, 10);
+    var helper = new THREE.GridHelper(160, 10, 0xcccccc, 0xcccccc);
     helper.rotation.x = Math.PI / 2;
-    this.scene.add(helper);
 
-    //
+    // this.scene.add(helper);
 
+    ////////LIGHTS
+    const light1 = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(light1);
+    this.light2 = new THREE.PointLight(0xffffff, 0.6, 0, 2);
+    this.light2.position.set(0, 500, 600);
+    scene.add(this.light2);
+    const light3 = new THREE.HemisphereLight(0xffffff, 0x366b24, 2);
+    scene.add(light3);
+
+    ////////////LOADER
     var loader = new THREE.SVGLoader();
     loader.load("assets/svg/Hom_logo3a.svg", function(paths) {
       var group = new THREE.Group();
       group.scale.multiplyScalar(0.25);
-      group.position.x = -70;
-      group.position.y = 70;
+      group.position.x = -132;
+      group.position.y = 80;
       group.scale.y *= -1;
 
       for (var i = 0; i < paths.length; i++) {
         var path = paths[i];
 
-        var material = new THREE.MeshBasicMaterial({
-          color: path.color,
-          side: THREE.DoubleSide,
-          depthWrite: false
+        var material = new THREE.MeshStandardMaterial({
+          color: 0x7abf50,
+          roughness: 0.2,
+          metalness: 0.53
         });
 
         var shapes = path.toShapes(true);
 
         for (var j = 0; j < shapes.length; j++) {
           var shape = shapes[j];
-
-          var geometry = new THREE.ShapeBufferGeometry(shape);
+          var extrudeSettings = {
+            steps: 2,
+            depth: 20,
+            bevelEnabled: true,
+            bevelThickness: 1,
+            bevelSize: 1,
+            bevelSegments: 1,
+            curveSegments: 40
+          };
+          var geometry = new THREE.ExtrudeBufferGeometry(
+            shape,
+            extrudeSettings
+          );
           var mesh = new THREE.Mesh(geometry, material);
 
           group.add(mesh);
         }
       }
-
-      this.scene.add(group);
+      scene.add(group);
     });
 
-    //
-
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-
-    window.addEventListener("resize", this.onWindowResize, false);
+    ////////////// CONTROLS
+    var controls = new THREE.OrbitControls(
+      this.camera,
+      this.renderer.domElement
+    );
+    controls.screenSpacePanning = true;
 
     document.body.addEventListener("dblclick", function(event) {
       var group = this.scene.children[1];
@@ -85,7 +101,8 @@ class App extends Component {
           child.material.wireframe = !child.material.wireframe;
       });
     });
-  };
+    this.animate();
+  }
 
   onWindowResize = () => {
     this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -97,15 +114,10 @@ class App extends Component {
   animate = () => {
     requestAnimationFrame(this.animate);
 
-    this.run();
-  };
-
-  run = () => {
     this.renderer.render(this.scene, this.camera);
   };
 
   render() {
-    // console.log(this.state.mouseX, this.state.mouseY);
     return (
       <canvas ref={el => (this.canvas = el)} onMouseMove={this.mouseMove} />
     );

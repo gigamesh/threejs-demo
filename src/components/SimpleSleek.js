@@ -5,6 +5,11 @@ require("three/examples/js/loaders/SVGLoader");
 require("three/examples/js/controls/OrbitControls");
 
 class SimpleSleek extends Component {
+  state = {
+    mouseX: 0,
+    mouseY: 0,
+    wireframe: false
+  };
   componentDidMount() {
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -15,7 +20,7 @@ class SimpleSleek extends Component {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
-    window.addEventListener("resize", this.onWindowResize, false);
+    // window.addEventListener("resize", this.onWindowResize, false);
 
     ////////////// CAMERA
     this.camera = new THREE.PerspectiveCamera(
@@ -39,18 +44,19 @@ class SimpleSleek extends Component {
     /////////// LIGHTS
     const light1 = new THREE.AmbientLight(0xffffff, 0.9);
     scene.add(light1);
-    this.light2 = new THREE.PointLight(0xffffff, 0.6);
-    this.light2.position.set(0, 150, 100);
-    this.light2.castShadow = true;
-    this.light2.shadow.mapSize.height = 2048;
-    this.light2.shadow.mapSize.width = 2048;
-    this.light2.shadow.radius = 4;
-
-    scene.add(this.light2);
+    this.light2 = new THREE.PointLight(0xffffff, 0.6, 0, 2);
+    const { light2 } = this;
+    light2.position.set(0, 100, 100);
+    light2.castShadow = true;
+    light2.shadow.mapSize.height = 2048;
+    light2.shadow.mapSize.width = 2048;
+    light2.shadow.radius = 4;
+    light2.shadow.camera.far = 1500;
+    scene.add(light2);
     const light3 = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
     scene.add(light3);
 
-    // var lightHelper = new THREE.CameraHelper(this.light2.shadow.camera);
+    // var lightHelper = new THREE.PointLightHelper(light2, 20, 0x444444);
     // scene.add(lightHelper);
 
     //////////// LOADER
@@ -59,7 +65,7 @@ class SimpleSleek extends Component {
       var group = new THREE.Group();
       group.scale.multiplyScalar(0.25);
       group.position.x = -132;
-      group.position.y = 80;
+      group.position.y = 40;
       group.scale.y *= -1;
 
       for (var i = 0; i < paths.length; i++) {
@@ -98,8 +104,7 @@ class SimpleSleek extends Component {
 
       const planeGeo = new THREE.PlaneGeometry(4000, 4000, 100, 100);
       const planeMaterial = new THREE.MeshStandardMaterial({
-        color: 0xf4f4e6,
-        side: THREE.DoubleSide
+        color: 0xf4f4e6
       });
       const planeMesh = new THREE.Mesh(planeGeo, planeMaterial);
       planeMesh.receiveShadow = true;
@@ -117,6 +122,10 @@ class SimpleSleek extends Component {
     this.animate();
   }
 
+  componentWillUnmount() {
+    // window.removeEventListener("resize", this.onWindowResize);
+  }
+
   onWindowResize = () => {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
@@ -126,10 +135,20 @@ class SimpleSleek extends Component {
 
   animate = () => {
     requestAnimationFrame(this.animate);
-
+    this.light2.position.set(
+      this.state.mouseX - 900,
+      -this.state.mouseY + 800,
+      200
+    );
     this.renderer.render(this.scene, this.camera);
   };
 
+  mouseMove = e => {
+    this.setState({
+      mouseX: e.nativeEvent.offsetX,
+      mouseY: e.nativeEvent.offsetY
+    });
+  };
   render() {
     return (
       <canvas ref={el => (this.canvas = el)} onMouseMove={this.mouseMove} />

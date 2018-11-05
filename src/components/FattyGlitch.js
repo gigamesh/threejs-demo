@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 const THREE = require("three");
-const fontJSON = require("./helvetiker_bold.typeface.json");
+const fontJSON = require("../helvetiker_bold.typeface.json");
 
 export default class FattyGlitch extends Component {
   state = {
@@ -28,7 +28,7 @@ export default class FattyGlitch extends Component {
     this.scene = new THREE.Scene();
     const scene = this.scene;
 
-    const light1 = new THREE.AmbientLight(0x85c210, 1.5);
+    const light1 = new THREE.AmbientLight(0x85c210, 1);
     scene.add(light1);
     this.light2 = new THREE.PointLight(0x22ffffff, 0.5, 0, 2);
     const light2 = this.light2;
@@ -48,14 +48,10 @@ export default class FattyGlitch extends Component {
       material: 10
     });
 
-    geometry.translate(-250, 0, 0);
-    // geometry.rotateY(0.25);
+    geometry.translate(-235, 0, 0);
     geometry.rotateX(-0.2);
-    // geometry.rotateZ(0.5);
     this.material = new THREE.MeshStandardMaterial({
       color: 0x6ebf42,
-      // emissive: 0x0b3307,
-      // emissiveIntensity: 0.1,
       metalness: 0.5,
       roughness: 0.5,
       wireframe: false
@@ -98,7 +94,6 @@ export default class FattyGlitch extends Component {
   };
 
   mouseMove = e => {
-    // console.log(e.nativeEvent.offsetX);
     this.setState({
       mouseX: e.nativeEvent.offsetX,
       mouseY: e.nativeEvent.offsetY

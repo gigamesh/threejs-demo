@@ -5,20 +5,12 @@ require("three/examples/js/loaders/SVGLoader");
 require("three/examples/js/controls/OrbitControls");
 
 class SimpleSleek extends Component {
+  state = {
+    mouseX: 0,
+    mouseY: 0,
+    wireframe: false
+  };
   componentDidMount() {
-    const { onWindowResize } = this.props;
-    window.addEventListener("resize", () => onWindowResize(this.canvas), false);
-    this.repaint();
-  }
-
-  componentWillUnmount() {
-    const { onWindowResize } = this.props;
-    window.removeEventListener("resize", () => onWindowResize(this.canvas));
-  }
-
-  repaint = () => {
-    const { width, height } = this.props.canvas;
-
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true
@@ -27,6 +19,8 @@ class SimpleSleek extends Component {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
+
+    // window.addEventListener("resize", this.onWindowResize, false);
 
     ////////////// CAMERA
     this.camera = new THREE.PerspectiveCamera(
@@ -40,7 +34,7 @@ class SimpleSleek extends Component {
     ///////////// SCENE
     this.scene = new THREE.Scene();
     const { scene } = this;
-    this.scene.background = new THREE.Color(0xffffff);
+    this.scene.background = new THREE.Color(0xf4f4e6);
 
     var helper = new THREE.GridHelper(160, 10, 0xcccccc, 0xcccccc);
     helper.rotation.x = Math.PI / 2;
@@ -59,7 +53,7 @@ class SimpleSleek extends Component {
     light2.shadow.radius = 4;
     light2.shadow.camera.far = 1500;
     scene.add(light2);
-    const light3 = new THREE.HemisphereLight(0xffffff, 0x000000, 1.8);
+    const light3 = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
     scene.add(light3);
 
     // var lightHelper = new THREE.PointLightHelper(light2, 20, 0x444444);
@@ -110,7 +104,7 @@ class SimpleSleek extends Component {
 
       const planeGeo = new THREE.PlaneGeometry(4000, 4000, 100, 100);
       const planeMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff
+        color: 0xf4f4e6
       });
       const planeMesh = new THREE.Mesh(planeGeo, planeMaterial);
       planeMesh.receiveShadow = true;
@@ -126,25 +120,41 @@ class SimpleSleek extends Component {
     controls.screenSpacePanning = true;
 
     this.animate();
+  }
+
+  componentWillUnmount() {
+    // window.removeEventListener("resize", this.onWindowResize);
+  }
+
+  onWindowResize = () => {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
   };
 
   animate = () => {
     requestAnimationFrame(this.animate);
     this.light2.position.set(
-      this.props.mouse.x - 900,
-      -this.props.mouse.y + 800,
+      this.state.mouseX - 900,
+      -this.state.mouseY + 800,
       200
     );
     this.renderer.render(this.scene, this.camera);
   };
 
+  mouseMove = e => {
+    //   function convertRange( value, r1, r2 ) {
+    //     return ( value - r1[ 0 ] ) * ( r2[ 1 ] - r2[ 0 ] ) / ( r1[ 1 ] - r1[ 0 ] ) + r2[ 0 ];
+    // }
+    this.setState({
+      mouseX: e.nativeEvent.offsetX,
+      mouseY: e.nativeEvent.offsetY
+    });
+  };
   render() {
-    console.log(this.props.canvas.width, this.props.canvas.height);
     return (
-      <canvas
-        ref={el => (this.canvas = el)}
-        onMouseMove={this.props.mouseMove}
-      />
+      <canvas ref={el => (this.canvas = el)} onMouseMove={this.mouseMove} />
     );
   }
 }

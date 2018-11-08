@@ -4,8 +4,6 @@ const fontJSON = require("../helvetiker_bold.typeface.json");
 
 export default class FattyGlitch extends Component {
   state = {
-    mouseX: 0,
-    mouseY: 0,
     wireframe: false
   };
 
@@ -85,8 +83,8 @@ export default class FattyGlitch extends Component {
     let wave = Math.sin((this.delta += 0.01));
     this.mesh.rotation.y += wave * 0.001;
     this.light2.position.set(
-      this.state.mouseX - 800,
-      this.state.mouseY - 300,
+      this.props.mouse.x - 800,
+      this.props.mouse.y - 300,
       -100
     );
     this.renderer.render(this.scene, this.camera);
@@ -101,7 +99,10 @@ export default class FattyGlitch extends Component {
   };
   render() {
     return (
-      <canvas ref={el => (this.canvas = el)} onMouseMove={this.mouseMove} />
+      <canvas
+        ref={el => (this.canvas = el)}
+        onMouseMove={this.props.mouseMove}
+      />
     );
   }
 }

@@ -1,21 +1,17 @@
 import React, { Component } from "react";
 
-const THREE = (window.THREE = require("three"));
-// const EffectComposer = require("three-effectcomposer")(THREE);
+var THREE = (window.THREE = require("three"));
 require("three/examples/js/loaders/SVGLoader");
 require("three/examples/js/controls/OrbitControls");
 
 require("three/examples/js/shaders/CopyShader");
 require("three/examples/js/shaders/AfterimageShader");
 require("three/examples/js/shaders/FXAAShader");
+require("three/examples/js/postprocessing/EffectComposer");
 require("three/examples/js/postprocessing/RenderPass");
-// require("three/examples/js/postprocessing/MaskPass");
-// require("three/examples/js/postprocessing/ShaderPass");
-// require("three/examples/js/postprocessing/AfterimagePass");
-// require("three/examples/js/postprocessing/EffectComposer");
-const EffectComposer = require("three-effectcomposer")(THREE);
-
-const fxaa = require("three-shader-fxaa");
+require("three/examples/js/postprocessing/MaskPass");
+require("three/examples/js/postprocessing/ShaderPass");
+require("three/examples/js/postprocessing/AfterimagePass");
 
 class SimpleSleek extends Component {
   state = {
@@ -126,20 +122,22 @@ class SimpleSleek extends Component {
     });
 
     ///////////////  POST-PROCESSING
-    this.composer = new EffectComposer(this.renderer);
-    this.composer.addPass(new EffectComposer.RenderPass(scene, this.camera));
+    this.composer = new THREE.EffectComposer(this.renderer);
 
-    // const afterimagePass = new THREE.AfterimagePass();
-    // afterimagePass.renderToScreen = true;
+    const afterimagePass = new THREE.AfterimagePass();
+    afterimagePass.renderToScreen = true;
 
-    // Add FXAA pass
-    const shaderPass = new EffectComposer.ShaderPass(fxaa());
-    shaderPass.renderToScreen = true;
-    this.composer.addPass(shaderPass);
+    const effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
+    effectFXAA.uniforms["resolution"].value.set(
+      1 / (width * dpr),
+      1 / (height * dpr)
+    );
+    effectFXAA.renderToScreen = true;
+    this.composer.setSize(width * dpr, height * dpr);
 
-    // Make sure screen resolution is set!
-    shaderPass.uniforms.resolution.value.set(width, height);
-    // this.composer.addPass(afterimagePass);
+    this.composer.addPass(afterimagePass);
+    this.composer.addPass(new THREE.RenderPass(scene, this.camera));
+    // this.composer.addPass(effectFXAA);
 
     ////////////// CONTROLS
     var controls = new THREE.OrbitControls(

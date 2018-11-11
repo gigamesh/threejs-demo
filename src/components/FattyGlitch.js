@@ -8,6 +8,20 @@ export default class FattyGlitch extends Component {
   };
 
   componentDidMount() {
+    this.repaint();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.dimensions.width !== this.props.dimensions.width ||
+      prevProps.dimensions.height !== this.props.dimensions.height
+    ) {
+      this.repaint();
+    }
+  }
+
+  repaint() {
+    const { width, height } = this.props.dimensions;
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true
@@ -15,14 +29,9 @@ export default class FattyGlitch extends Component {
     const renderer = this.renderer;
     renderer.setClearColor(0xffffff);
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(width, height);
 
-    this.camera = new THREE.PerspectiveCamera(
-      35,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      3000
-    );
+    this.camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 3000);
     this.scene = new THREE.Scene();
     const scene = this.scene;
 
@@ -40,13 +49,13 @@ export default class FattyGlitch extends Component {
 
     const geometry = new THREE.TextGeometry("HOUSE OF MOVES", {
       font,
-      size: 40,
+      size: 60,
       height: 20,
       bevelThickness: 20,
       material: 10
     });
 
-    geometry.translate(-235, 0, 0);
+    geometry.translate(-360, 0, 0);
     geometry.rotateX(-0.2);
     this.material = new THREE.MeshStandardMaterial({
       color: 0x6ebf42,
@@ -62,7 +71,7 @@ export default class FattyGlitch extends Component {
 
     requestAnimationFrame(this.animate);
 
-    this.glitchTimer = setInterval(this.glitch, 5000);
+    this.glitchTimer = setInterval(this.glitch, 4000);
   }
 
   glitch = () => {
@@ -73,15 +82,15 @@ export default class FattyGlitch extends Component {
         this.material.wireframe = true;
         setTimeout(() => {
           this.material.wireframe = false;
-        }, 50);
-      }, 50);
-    }, 50);
+        }, 70);
+      }, 60);
+    }, 80);
   };
 
   delta = 0;
   animate = () => {
-    let wave = Math.sin((this.delta += 0.01));
-    this.mesh.rotation.y += wave * 0.001;
+    let wave = Math.sin((this.delta += 0.02));
+    this.mesh.rotation.y += wave * 0.0005;
     this.light2.position.set(
       this.props.mouse.x - 800,
       this.props.mouse.y - 300,

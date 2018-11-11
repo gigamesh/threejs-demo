@@ -8,15 +8,27 @@ require("three/examples/js/controls/OrbitControls");
 
 class App extends Component {
   state = {
-    option: "1",
-    mouse: { x: 0, y: 0 },
-    canvas: { width: 0, height: 0 }
+    option: "3",
+    mouse: { x: 200, y: 200 },
+    dimensions: { width: 0, height: 0 }
   };
 
-  onWindowResize = el => {
-    const { width, height } = el.getBoundingClientRect();
+  componentDidMount() {
+    window.addEventListener("resize", () => this.getCanvasSize(), false);
+    window.addEventListener("mousemove", this.mouseMove, false);
+    this.getCanvasSize();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", () => this.getCanvasSize());
+    window.removeEventListener("mousemove", () => this.mouseMove);
+  }
+
+  getCanvasSize = () => {
+    const { width, height } = this.canvasWrap.getBoundingClientRect();
+    // console.log("getCanvasSize", width, height);
     this.setState({
-      canvas: {
+      dimensions: {
         width,
         height
       }
@@ -28,47 +40,34 @@ class App extends Component {
   };
 
   mouseMove = e => {
-    // x: 680, y: 695 ===> x: 1182, y: 695
-
-    function convertRange(value, range1, range2) {
-      return (
-        ((value - range1[0]) * (range2[1] - range2[0])) /
-          (range1[1] - range1[0]) +
-        range2[0]
-      );
-    }
-    this.setState({
-      mouse: { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }
-    });
+    this.setState({ mouse: { x: e.clientX, y: e.clientY } });
   };
 
   render() {
-    const { option, mouse, canvas } = this.state;
-    // console.log(option);
+    const { option, mouse, dimensions } = this.state;
     return (
       <React.Fragment>
-        {option === "1" ? (
-          <SimpleSleek
-            mouseMove={this.mouseMove}
-            mouse={mouse}
-            canvas={canvas}
-            onWindowResize={this.onWindowResize}
-          />
-        ) : option === "2" ? (
-          <FattyGlitch
-            mouseMove={this.mouseMove}
-            mouse={mouse}
-            canvas={canvas}
-            onWindowResize={this.onWindowResize}
-          />
-        ) : option === "3" ? (
-          <Experiment1
-            mouseMove={this.mouseMove}
-            mouse={mouse}
-            canvas={canvas}
-            onWindowResize={this.onWindowResize}
-          />
-        ) : null}
+        <div id="canvas-wrap" ref={el => (this.canvasWrap = el)}>
+          {option === "1" ? (
+            <SimpleSleek
+              mouse={mouse}
+              dimensions={dimensions}
+              onWindowResize={this.getCanvasSize}
+            />
+          ) : option === "2" ? (
+            <FattyGlitch
+              mouse={mouse}
+              dimensions={dimensions}
+              onWindowResize={this.getCanvasSize}
+            />
+          ) : option === "3" ? (
+            <Experiment1
+              mouse={mouse}
+              dimensions={dimensions}
+              onWindowResize={this.getCanvasSize}
+            />
+          ) : null}
+        </div>
         <form>
           <fieldset>
             <input

@@ -1,17 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <title>three.js webgl - svg loader</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+  </head>
 
-<head>
-  <title>three.js webgl - svg loader</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-</head>
+  <body>
+    <div id="container"></div>
 
-<body>
-
-  <div id="container"></div>
+    <script id="vertShader" type="shader-code">
+      varying vec2 vUv;
 
 
-</body>
+      void main() {
 
+        vUv = uv;
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+      }
+
+    </script>
+
+    <script id="fragShader" type="shader-code">
+      uniform sampler2D tOld;
+
+      uniform sampler2D tNew;
+
+
+      varying vec2 vUv;
+
+
+      // from http://theorangeduck.com/page/avoiding-shader-conditionals
+
+      float when_gt(float x, float y) {
+
+        return max(sign(x - y), 0.0);
+
+      }
+
+
+      void main() {
+
+        vec4 texelOld = texture2D(tOld, vUv);
+
+        vec4 texelNew = texture2D(tNew, vUv);
+
+        texelOld *= 0.96;
+
+
+        // the expressions bellow are equivalent to
+
+        // if (texelOld.a < 0.2) texelOld.a = 0.0;
+
+        texelOld.r *= when_gt(texelOld.r, 0.2);
+
+        texelOld.g *= when_gt(texelOld.g, 0.2);
+
+        texelOld.b *= when_gt(texelOld.b, 0.2);
+
+        texelOld.a *= when_gt(texelOld.a, 0.2);
+
+
+        gl_FragColor = texelOld + texelNew;
+
+      }
+
+    </script>
+  </body>
 </html>

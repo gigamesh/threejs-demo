@@ -5,36 +5,39 @@ require("three/examples/js/loaders/SVGLoader");
 require("three/examples/js/controls/OrbitControls");
 
 class SimpleSleek extends Component {
+  state = {
+    lightPos: { x: 450, y: 700 }
+  };
   componentDidMount() {
-    const { onWindowResize } = this.props;
-    window.addEventListener("resize", () => onWindowResize(this.canvas), false);
     this.repaint();
   }
 
-  componentWillUnmount() {
-    const { onWindowResize } = this.props;
-    window.removeEventListener("resize", () => onWindowResize(this.canvas));
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.dimensions.width !== this.props.dimensions.width ||
+      prevProps.dimensions.height !== this.props.dimensions.height
+    ) {
+      this.repaint();
+    }
+    if (prevProps.mouse.x !== this.props.mouse.x) {
+      this.getLightPosition();
+    }
   }
 
   repaint = () => {
-    const { width, height } = this.props.canvas;
+    const { width, height } = this.props.dimensions;
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true
     });
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
     ////////////// CAMERA
-    this.camera = new THREE.PerspectiveCamera(
-      50,
-      window.innerWidth / window.innerHeight,
-      1,
-      1000
-    );
+    this.camera = new THREE.PerspectiveCamera(50, width / height, 1, 1000);
     this.camera.position.set(0, 0, 200);
 
     ///////////// SCENE
@@ -69,8 +72,8 @@ class SimpleSleek extends Component {
     var loader = new THREE.SVGLoader();
     loader.load("assets/svg/Hom_logo3a.svg", function(paths) {
       var group = new THREE.Group();
-      group.scale.multiplyScalar(0.25);
-      group.position.x = -132;
+      group.scale.multiplyScalar(0.4);
+      group.position.x = -200;
       group.position.y = 40;
       group.scale.y *= -1;
 
@@ -89,7 +92,7 @@ class SimpleSleek extends Component {
           var shape = shapes[j];
           var extrudeSettings = {
             steps: 2,
-            depth: 20,
+            depth: 15,
             bevelEnabled: true,
             bevelThickness: 1,
             bevelSize: 1,
@@ -128,24 +131,45 @@ class SimpleSleek extends Component {
     this.animate();
   };
 
+  getLightPosition() {
+    const { x: mouseX } = this.props.mouse;
+    const xRange = [450, 1400];
+    const midPoint = window.innerWidth / 2;
+    const x = convertRange(mouseX, [0, window.innerWidth], xRange);
+    const y = getYValue();
+
+    this.setState({
+      lightPos: { x, y }
+    });
+
+    function getYValue() {
+      const inputRange =
+        mouseX < midPoint ? [0, midPoint] : [midPoint, window.innerWidth];
+      const outputRange = mouseX < midPoint ? [700, 300] : [300, 700];
+      return convertRange(mouseX, inputRange, outputRange);
+    }
+
+    function convertRange(value, range1, range2) {
+      return (
+        ((value - range1[0]) * (range2[1] - range2[0])) /
+          (range1[1] - range1[0]) +
+        range2[0]
+      );
+    }
+  }
+
   animate = () => {
     requestAnimationFrame(this.animate);
     this.light2.position.set(
-      this.props.mouse.x - 900,
-      -this.props.mouse.y + 800,
+      this.state.lightPos.x - 900,
+      -this.state.lightPos.y + 800,
       200
     );
     this.renderer.render(this.scene, this.camera);
   };
 
   render() {
-    console.log(this.props.canvas.width, this.props.canvas.height);
-    return (
-      <canvas
-        ref={el => (this.canvas = el)}
-        onMouseMove={this.props.mouseMove}
-      />
-    );
+    return <canvas ref={el => (this.canvas = el)} />;
   }
 }
 

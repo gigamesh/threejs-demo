@@ -8,16 +8,43 @@ require("three/examples/js/controls/OrbitControls");
 
 class App extends Component {
   state = {
-    option: "3",
+    option: "1",
     mouse: { x: 200, y: 200 },
-    dimensions: { width: 0, height: 0 }
+    dimensions: { width: 0, height: 0 },
+    orient: {},
+    tick: false
   };
 
   componentDidMount() {
     window.addEventListener("resize", () => this.getCanvasSize(), false);
     window.addEventListener("mousemove", this.mouseMove, false);
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener(
+        "deviceorientation",
+        this.orientationHandler,
+        false
+      );
+    }
     this.getCanvasSize();
   }
+
+  orientationHandler = e => {
+    if (this.state.tick) {
+      this.setState({
+        orient: {
+          alpha: e.alpha,
+          beta: e.beta,
+          gamma: e.gamma
+        },
+        tick: false
+      });
+    }
+    requestAnimationFrame(this.nextFrame);
+  };
+
+  nextFrame = () => {
+    this.setState({ tick: true });
+  };
 
   componentWillUnmount() {
     window.removeEventListener("resize", () => this.getCanvasSize());
@@ -40,13 +67,18 @@ class App extends Component {
   };
 
   mouseMove = e => {
-    this.setState({ mouse: { x: e.clientX, y: e.clientY } });
+    if (this.state.tick) {
+      this.setState({ mouse: { x: e.clientX, y: e.clientY } });
+    }
   };
 
   render() {
-    const { option, mouse, dimensions } = this.state;
+    const { option, mouse, dimensions, orient } = this.state;
+    const color = option === "2" ? blackBG : whiteBG;
+    console.log(orient);
     return (
-      <React.Fragment>
+      <div style={{ ...backgroundWrap, ...color }}>
+        <div>orient: {orient.alpha}</div>
         <div id="canvas-wrap" ref={el => (this.canvasWrap = el)}>
           {option === "1" ? (
             <SimpleSleek
@@ -98,9 +130,26 @@ class App extends Component {
             <label htmlFor="3">3</label>
           </fieldset>
         </form>
-      </React.Fragment>
+      </div>
     );
   }
 }
+
+const backgroundWrap = {
+  width: "100%",
+  height: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column"
+};
+
+const blackBG = {
+  background: "#111"
+};
+
+const whiteBG = {
+  background: "#fff"
+};
 
 export default App;

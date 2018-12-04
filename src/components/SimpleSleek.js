@@ -70,18 +70,18 @@ class SimpleSleek extends Component {
 
     //////////// LOADER
     var loader = new THREE.SVGLoader();
-    loader.load("assets/svg/Hom_logo3a.svg", function(paths) {
+    loader.load("assets/svg/daylight1a.svg", function(paths) {
       var group = new THREE.Group();
-      group.scale.multiplyScalar(0.4);
-      group.position.x = -200;
-      group.position.y = 40;
+      group.scale.multiplyScalar(0.55);
+      group.position.x = -290;
+      group.position.y = 60;
       group.scale.y *= -1;
 
       for (var i = 0; i < paths.length; i++) {
         var path = paths[i];
 
         var textMaterial = new THREE.MeshStandardMaterial({
-          color: 0x7abf50,
+          color: 0xf2eb8a,
           roughness: 0.2,
           metalness: 0.53
         });
@@ -92,7 +92,7 @@ class SimpleSleek extends Component {
           var shape = shapes[j];
           var extrudeSettings = {
             steps: 2,
-            depth: 15,
+            depth: 10,
             bevelEnabled: true,
             bevelThickness: 1,
             bevelSize: 1,

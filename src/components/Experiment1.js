@@ -14,9 +14,15 @@ require("three/examples/js/postprocessing/ShaderPass");
 require("three/examples/js/postprocessing/AfterimagePass");
 
 class SimpleSleek extends Component {
-  state = {
-    lightPos: { x: 450, y: 700 }
-  };
+  constructor() {
+    super();
+    this.group = new THREE.Group();
+    this.pivot = new THREE.Object3D();
+    this.state = {
+      logoPos: { x: 0, y: 0 }
+    };
+  }
+
   componentDidMount() {
     this.repaint();
   }
@@ -29,7 +35,7 @@ class SimpleSleek extends Component {
       this.repaint();
     }
     if (prevProps.mouse.x !== this.props.mouse.x) {
-      this.getLightPosition();
+      this.getLogoPosition();
     }
   }
 
@@ -79,12 +85,10 @@ class SimpleSleek extends Component {
 
     //////////// LOADER
     var loader = new THREE.SVGLoader();
-    loader.load("assets/svg/Hom_logo3a.svg", function(paths) {
-      var group = new THREE.Group();
-      group.scale.multiplyScalar(0.4);
-      group.position.x = -200;
-      group.position.y = 40;
-      group.scale.y *= -1;
+    loader.load("assets/svg/Hom_logo3a.svg", paths => {
+      this.pivot.position.x = -80;
+      this.pivot.position.y = 0;
+      this.pivot.scale.y *= -1;
 
       for (var i = 0; i < paths.length; i++) {
         var path = paths[i];
@@ -112,13 +116,15 @@ class SimpleSleek extends Component {
             shape,
             extrudeSettings
           );
-          var mesh = new THREE.Mesh(geometry, textMaterial);
-
-          group.add(mesh);
+          const mesh = new THREE.Mesh(geometry, textMaterial);
+          mesh.position.x = -350;
+          mesh.position.y = -100;
+          this.group.add(mesh);
+          this.pivot.add(mesh);
         }
       }
-
-      scene.add(group);
+      scene.add(this.pivot);
+      scene.add(this.group);
     });
 
     ///////////////  POST-PROCESSING
@@ -140,32 +146,26 @@ class SimpleSleek extends Component {
     // this.composer.addPass(effectFXAA);
 
     ////////////// CONTROLS
-    var controls = new THREE.OrbitControls(
-      this.camera,
-      this.renderer.domElement
-    );
-    controls.screenSpacePanning = true;
+    // var controls = new THREE.OrbitControls(
+    //   this.camera,
+    //   this.renderer.domElement
+    // );
+    // controls.screenSpacePanning = true;
 
     this.animate();
   };
 
-  getLightPosition() {
-    const { x: mouseX } = this.props.mouse;
-    const xRange = [450, 1400];
+  getLogoPosition() {
+    const { x: mouseX, y: mouseY } = this.props.mouse;
     const midPoint = window.innerWidth / 2;
+    const xRange = [-0.05, 0.05];
+    const yRange = [-0.3, 0.3];
     const x = convertRange(mouseX, [0, window.innerWidth], xRange);
-    const y = getYValue();
+    const y = convertRange(mouseY, [0, window.innerHeight], yRange);
 
     this.setState({
-      lightPos: { x, y }
+      logoPos: { x, y }
     });
-
-    function getYValue() {
-      const inputRange =
-        mouseX < midPoint ? [0, midPoint] : [midPoint, window.innerWidth];
-      const outputRange = mouseX < midPoint ? [700, 300] : [300, 700];
-      return convertRange(mouseX, inputRange, outputRange);
-    }
 
     function convertRange(value, range1, range2) {
       return (
@@ -176,18 +176,24 @@ class SimpleSleek extends Component {
     }
   }
 
+  zoom = 0;
   animate = () => {
     requestAnimationFrame(this.animate);
-    this.light2.position.set(
-      this.state.lightPos.x - 900,
-      -this.state.lightPos.y + 800,
-      200
-    );
-    // this.renderer.render(this.scene, this.camera);
+
+    this.pivot.rotation.y = this.state.logoPos.x;
+    this.pivot.rotation.x = this.state.logoPos.y;
+    if (this.zoom < 0.45) {
+      this.zoom += 0.01;
+      this.pivot.scale.x = this.zoom;
+      this.pivot.scale.y = -this.zoom;
+      this.pivot.scale.z = this.zoom;
+    }
+
     this.composer.render();
   };
 
   render() {
+    // console.log(this.state.logoPos);
     return <canvas ref={el => (this.canvas = el)} />;
   }
 }

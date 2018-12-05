@@ -62,8 +62,7 @@ class SimpleSleek extends Component {
     ///////////// SCENE
     this.scene = new THREE.Scene();
     const { scene } = this;
-    // scene.background = new THREE.Color(0xffffff);
-    // scene.fog = new THREE.Fog(0x000000, 1, 1000);
+    scene.fog = new THREE.Fog(0x000000, 1, 1000);
 
     var helper = new THREE.GridHelper(160, 10, 0xcccccc, 0xcccccc);
     helper.rotation.x = Math.PI / 2;

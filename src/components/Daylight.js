@@ -81,7 +81,7 @@ class SimpleSleek extends Component {
         var path = paths[i];
 
         var textMaterial = new THREE.MeshStandardMaterial({
-          color: 0xf2eb8a,
+          color: 0xe2d258,
           roughness: 0.2,
           metalness: 0.53
         });

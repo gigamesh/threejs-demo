@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import SimpleSleek from "./components/SimpleSleek";
-import FattyGlitch from "./components/FattyGlitch";
-import Experiment1 from "./components/Experiment1";
+import SimpleSleek from "./components/Daylight";
+import FattyGlitch from "./components/NightLight";
+import PureGold from "./components/PureGold";
 
 require("three/examples/js/loaders/SVGLoader");
 require("three/examples/js/controls/OrbitControls");
@@ -52,7 +52,7 @@ class App extends Component {
   }
 
   getCanvasSize = () => {
-    const { width, height } = this.canvasWrap.getBoundingClientRect();
+    const { width, height } = this.wrap.getBoundingClientRect();
     // console.log("getCanvasSize", width, height);
     this.setState({
       dimensions: {
@@ -74,34 +74,21 @@ class App extends Component {
 
   render() {
     const { option, mouse, dimensions, orient } = this.state;
-    const color = option === "2" ? blackBG : whiteBG;
-    console.log(orient);
+    const color = option === "1" ? whiteBG : option === "2" ? blackBG : goldBG;
     return (
       <div style={{ ...backgroundWrap, ...color }}>
-        <div>orient: {orient.alpha}</div>
-        <div id="canvas-wrap" ref={el => (this.canvasWrap = el)}>
+        <div id="canvas-wrap" ref={el => (this.wrap = el)}>
           {option === "1" ? (
-            <SimpleSleek
-              mouse={mouse}
-              dimensions={dimensions}
-              onWindowResize={this.getCanvasSize}
-            />
+            <SimpleSleek mouse={mouse} dimensions={dimensions} />
           ) : option === "2" ? (
-            <FattyGlitch
-              mouse={mouse}
-              dimensions={dimensions}
-              onWindowResize={this.getCanvasSize}
-            />
+            <FattyGlitch mouse={mouse} dimensions={dimensions} />
           ) : option === "3" ? (
-            <Experiment1
-              mouse={mouse}
-              dimensions={dimensions}
-              onWindowResize={this.getCanvasSize}
-            />
+            <PureGold mouse={mouse} dimensions={dimensions} />
           ) : null}
         </div>
         <form>
           <fieldset>
+            <h3>Three.js Demo</h3>
             <input
               type="radio"
               name="options"
@@ -145,11 +132,16 @@ const backgroundWrap = {
 };
 
 const blackBG = {
-  background: "#111"
+  background: "radial-gradient(transparent, black 90%), #298484"
 };
 
 const whiteBG = {
   background: "#fff"
+};
+
+const goldBG = {
+  background: "#edbe15",
+  boxShadow: "inset 0 0 20vmax black"
 };
 
 export default App;

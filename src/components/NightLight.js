@@ -24,10 +24,11 @@ export default class FattyGlitch extends Component {
     const { width, height } = this.props.dimensions;
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
-      antialias: true
+      antialias: true,
+      alpha: true
     });
     const renderer = this.renderer;
-    renderer.setClearColor(0x111111);
+    renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
 
@@ -35,12 +36,12 @@ export default class FattyGlitch extends Component {
     this.scene = new THREE.Scene();
     const scene = this.scene;
 
-    const light1 = new THREE.AmbientLight(0x85c210, 0.8);
+    const light1 = new THREE.AmbientLight(0xc11111, 0.6);
     scene.add(light1);
-    this.light2 = new THREE.PointLight(0x22ffffff, 0.7, 0, 2);
+    this.light2 = new THREE.PointLight(0xf4c60c, 1.5);
     const light2 = this.light2;
     scene.add(light2);
-    const light3 = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
+    const light3 = new THREE.HemisphereLight(0x7ff2ff, 0xb20101, 1.7);
     // light3.position.set(50, 100, 1000);
     scene.add(light3);
 
@@ -57,15 +58,18 @@ export default class FattyGlitch extends Component {
 
     geometry.translate(-240, 0, 0);
     geometry.rotateX(-0.2);
-    this.material = new THREE.MeshStandardMaterial({
-      color: 0xccfdff,
-      metalness: 0.5,
-      roughness: 0.5,
+    this.material = new THREE.MeshPhysicalMaterial({
+      color: 0x43f9f9,
+      metalness: 0.4,
+      roughness: 0.4,
+      clearCoat: 0.5,
+      reflectivity: 0.5,
+      clearCoatRoughness: 0.5,
       wireframe: false
     });
     this.mesh = new THREE.Mesh(geometry, this.material);
     const mesh = this.mesh;
-    mesh.position.set(0, 0, -400);
+    mesh.position.set(0, -30, -300);
 
     scene.add(mesh);
 
@@ -108,16 +112,6 @@ export default class FattyGlitch extends Component {
   };
   render() {
     return (
-      // <div
-      //   style={{
-      //     position: "absolute",
-      //     top: 0,
-      //     right: 0,
-      //     background: "#111",
-      //     width: "100vw",
-      //     height: "100vh"
-      //   }}
-      // >
       <canvas
         ref={el => (this.canvas = el)}
         onMouseMove={this.props.mouseMove}

@@ -72,8 +72,8 @@ class SimpleSleek extends Component {
     var loader = new THREE.SVGLoader();
     loader.load("assets/svg/daylight1a.svg", function(paths) {
       var group = new THREE.Group();
-      group.scale.multiplyScalar(0.55);
-      group.position.x = -290;
+      group.scale.multiplyScalar(0.57);
+      group.position.x = -308;
       group.position.y = 60;
       group.scale.y *= -1;
 
@@ -122,11 +122,11 @@ class SimpleSleek extends Component {
     });
 
     ////////////// CONTROLS
-    var controls = new THREE.OrbitControls(
-      this.camera,
-      this.renderer.domElement
-    );
-    controls.screenSpacePanning = true;
+    // var controls = new THREE.OrbitControls(
+    //   this.camera,
+    //   this.renderer.domElement
+    // );
+    // controls.screenSpacePanning = true;
 
     this.animate();
   };

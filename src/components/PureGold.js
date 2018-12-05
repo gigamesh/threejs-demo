@@ -4,6 +4,11 @@ const fontJSON = require("../helvetiker_bold.typeface.json");
 const THREE = require("three");
 
 class PureGold extends Component {
+  state = {
+    rX: 0,
+    rY: 0
+  };
+
   componentDidMount() {
     this.repaint();
   }
@@ -13,6 +18,12 @@ class PureGold extends Component {
       prevProps.dimensions.height !== this.props.dimensions.height
     ) {
       this.repaint();
+    }
+    if (
+      prevProps.mouse.x !== this.props.mouse.x ||
+      prevProps.mouse.y !== this.props.mouse.y
+    ) {
+      this.getRotation();
     }
   }
   repaint = () => {
@@ -25,7 +36,6 @@ class PureGold extends Component {
     });
     const renderer = this.renderer;
     renderer.setClearColor(0x000000, 0);
-    // renderer.setClearColor(0xedbe15);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
 
@@ -59,8 +69,7 @@ class PureGold extends Component {
       bevelSegments: 1
     });
 
-    geometry.translate(-200, 0, 0);
-    // geometry.rotateX(-0.2);
+    geometry.translate(-280, 0, 0);
 
     this.material = new THREE.MeshPhysicalMaterial({
       color: 0xf7da4c,
@@ -71,16 +80,42 @@ class PureGold extends Component {
       envMapIntensity: 1.3
     });
     this.mesh = new THREE.Mesh(geometry, this.material);
-    this.mesh.position.set(-100, -20, -350);
-
+    this.mesh.position.set(-25, -20, -350);
     scene.add(this.mesh);
 
     requestAnimationFrame(this.animate);
   };
+
+  getRotation() {
+    const { x, y } = this.props.mouse;
+    const xRange = [-0.1, 0.1];
+    const yRange = [-0.2, 0.2];
+
+    const rX = convertRange(x, [0, window.innerWidth], xRange);
+    const rY = convertRange(y, [0, window.innerHeight], yRange);
+
+    this.setState({
+      rX,
+      rY
+    });
+
+    function convertRange(value, range1, range2) {
+      return (
+        ((value - range1[0]) * (range2[1] - range2[0])) /
+          (range1[1] - range1[0]) +
+        range2[0]
+      );
+    }
+  }
+
   delta = 0;
   animate = () => {
-    let wave = Math.sin((this.delta += 0.01));
-    this.mesh.rotation.y += wave * 0.0005;
+    const { x, y } = this.props.mouse;
+    // let wave = Math.sin((this.delta += 0.01));
+    // this.mesh.rotation.y += wave * 0.0005;
+
+    this.mesh.rotation.y = this.state.rX;
+    this.mesh.rotation.x = this.state.rY;
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.animate);
   };

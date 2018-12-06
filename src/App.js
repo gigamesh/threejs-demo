@@ -8,7 +8,7 @@ require("three/examples/js/controls/OrbitControls");
 
 class App extends Component {
   state = {
-    option: "1",
+    option: "3",
     mouse: { x: 200, y: 200 },
     dimensions: { width: 0, height: 0 },
     orient: {},
@@ -29,19 +29,19 @@ class App extends Component {
     this.nextFrame();
   }
 
-  // orientationHandler = e => {
-  //   if (this.state.tick) {
-  //     this.setState({
-  //       orient: {
-  //         alpha: e.alpha,
-  //         beta: e.beta,
-  //         gamma: e.gamma
-  //       },
-  //       tick: 0
-  //     });
-  //   }
-  //   requestAnimationFrame(this.nextFrame);
-  // };
+  orientationHandler = e => {
+    if (this.state.tick) {
+      this.setState({
+        orient: {
+          alpha: e.alpha,
+          beta: e.beta,
+          gamma: e.gamma
+        },
+        tick: 0
+      });
+    }
+    requestAnimationFrame(this.nextFrame);
+  };
 
   nextFrame = () => {
     this.setState(prevState => ({
@@ -85,9 +85,9 @@ class App extends Component {
   };
 
   render() {
-    const { option, mouse, dimensions, tick } = this.state;
+    const { option, mouse, dimensions, orient } = this.state;
 
-    const color = option === "1" ? whiteBG : option === "2" ? blackBG : goldBG;
+    const color = option === "1" ? whiteBG : option === "2" ? blackBG : whiteBG;
     return (
       <div style={{ ...backgroundWrap, ...color }}>
         <div id="canvas-wrap" ref={el => (this.wrap = el)}>
@@ -102,6 +102,9 @@ class App extends Component {
         <form>
           <fieldset>
             <h3>Three.js Demo</h3>
+            <h5>{orient.alpha}</h5>
+            <h5>{orient.beta}</h5>
+            <h5>{orient.gamma}</h5>
             <input
               type="radio"
               name="options"
@@ -153,7 +156,7 @@ const whiteBG = {
 };
 
 const goldBG = {
-  background: "#edbe15",
+  background: "#fcdd2f",
   boxShadow: "inset 0 0 20vmax black"
 };
 

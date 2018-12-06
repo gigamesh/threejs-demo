@@ -6,7 +6,8 @@ const THREE = require("three");
 class PureGold extends Component {
   state = {
     rX: 0,
-    rY: 0
+    rY: 0,
+    testX: 0
   };
 
   componentDidMount() {
@@ -20,8 +21,9 @@ class PureGold extends Component {
       this.repaint();
     }
     if (
-      prevProps.mouse.x !== this.props.mouse.x ||
-      prevProps.mouse.y !== this.props.mouse.y
+      this.props.mobile ||
+      (prevProps.mouse.x !== this.props.mouse.x ||
+        prevProps.mouse.y !== this.props.mouse.y)
     ) {
       this.getRotation();
     }
@@ -53,7 +55,7 @@ class PureGold extends Component {
     const font = fontLoader.parse(fontJSON);
 
     const textureloader = new THREE.CubeTextureLoader();
-    const textureCube = textureloader.load([
+    this.textureCube = textureloader.load([
       "assets/img/skyboxsun5deg2/pos-x.jpg",
       "assets/img/skyboxsun5deg2/neg-x.jpg",
       "assets/img/skyboxsun5deg2/pos-y.jpg",
@@ -61,35 +63,6 @@ class PureGold extends Component {
       "assets/img/skyboxsun5deg2/pos-z.jpg",
       "assets/img/skyboxsun5deg2/neg-z.jpg"
     ]);
-
-    textureCube.format = THREE.RGBFormat;
-    textureCube.mapping = THREE.CubeReflectionMapping;
-    textureCube.encoding = THREE.LinearEncoding;
-
-    /// skybox background
-    const cubeShader = THREE.ShaderLib["cube"];
-    const cubeMaterial = new THREE.ShaderMaterial({
-      fragmentShader: cubeShader.fragmentShader,
-      vertexShader: cubeShader.vertexShader,
-      uniforms: cubeShader.uniforms,
-      depthWrite: false,
-      side: THREE.BackSide
-    });
-    cubeMaterial.uniforms["tCube"].value = textureCube;
-    Object.defineProperty(cubeMaterial, "map", {
-      get: function() {
-        return this.uniforms.tCube.value;
-      }
-    });
-    this.sceneCube = new THREE.Scene();
-    const cubeMesh = new THREE.Mesh(
-      new THREE.BoxBufferGeometry(100, 100, 100),
-      cubeMaterial
-    );
-    cubeMesh.material = cubeMaterial;
-    cubeMesh.visible = true;
-
-    this.sceneCube.add(cubeMesh);
 
     const geometry = new THREE.TextGeometry("PURE GOLD BABY!", {
       font,
@@ -104,28 +77,41 @@ class PureGold extends Component {
 
     geometry.translate(-280, 0, 0);
 
-    this.material = new THREE.MeshPhysicalMaterial({
+    this.material = new THREE.MeshStandardMaterial({
       color: 0xf7da4c,
       metalness: 1,
-      roughness: 0.1,
+      roughness: 0,
       reflectivity: 1,
-      envMap: textureCube,
-      envMapIntensity: 1.7
+      envMap: this.textureCube,
+      envMapIntensity: 1.8
     });
     this.mesh = new THREE.Mesh(geometry, this.material);
     this.mesh.position.set(-20, -20, -350);
+
     scene.add(this.mesh);
 
     requestAnimationFrame(this.animate);
   };
 
   getRotation() {
-    const { x, y } = this.props.mouse;
-    const xRange = [-0.1, 0.2];
-    const yRange = [-0.15, 0.05];
+    let x, y, xInput, yInput;
+    let xOutput = [-0.1, 0.2];
+    let yOutput = [-0.15, 0.05];
 
-    const rX = convertRange(x, [0, window.innerWidth], xRange);
-    const rY = convertRange(y, [0, window.innerHeight], yRange);
+    if (this.props.mobile) {
+      x = this.props.orient.gamma;
+      y = this.props.orient.beta;
+      xInput = [100, 0];
+      yInput = [-90, 90];
+    } else {
+      x = this.props.mouse.x;
+      y = this.props.mouse.y;
+      xInput = [0, window.innerWidth];
+      yInput = [0, window.innerHeight];
+    }
+
+    const rX = convertRange(x, xInput, xOutput);
+    const rY = convertRange(y, yInput, yOutput);
 
     this.setState({
       rX,
@@ -143,17 +129,27 @@ class PureGold extends Component {
 
   delta = 0;
   animate = () => {
-    const { x, y } = this.props.mouse;
-
     this.mesh.rotation.y = this.state.rX;
     this.mesh.rotation.x = this.state.rY;
-    this.renderer.render(this.sceneCube, this.cameraCube);
+    // this.scene.background = this.textureCube;
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.animate);
   };
 
   render() {
-    return <canvas ref={el => (this.canvas = el)} />;
+    const { mobile, orient } = this.props;
+
+    return (
+      <React.Fragment>
+        <canvas ref={el => (this.canvas = el)} />
+        {mobile && (
+          <div>
+            <h5>beta: {orient.beta}</h5>
+            <h5>gamma: {orient.gamma}</h5>
+          </div>
+        )}
+      </React.Fragment>
+    );
   }
 }
 

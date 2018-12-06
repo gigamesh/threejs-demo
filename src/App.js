@@ -8,16 +8,24 @@ require("three/examples/js/controls/OrbitControls");
 
 class App extends Component {
   state = {
-    option: "3",
+    option: "1",
     mouse: { x: 200, y: 200 },
     dimensions: { width: 0, height: 0 },
     orient: {},
-    tick: 0
+    tick: 0,
+    mobile: false
   };
 
   componentDidMount() {
     window.addEventListener("resize", () => this.getCanvasSize(), false);
     window.addEventListener("mousemove", this.mouseMove, false);
+    if (
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      )
+    ) {
+      this.setState({ mobile: true });
+    }
     if (window.DeviceOrientationEvent) {
       window.addEventListener(
         "deviceorientation",
@@ -30,7 +38,7 @@ class App extends Component {
   }
 
   orientationHandler = e => {
-    if (this.state.tick) {
+    if (this.state.tick === 0) {
       this.setState({
         orient: {
           alpha: e.alpha,
@@ -55,15 +63,6 @@ class App extends Component {
     window.removeEventListener("mousemove", () => this.mouseMove);
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   if (
-  //     nextState.mouse.x === this.props.mouse.x ||
-  //     nextState.mouse.y === this.props.mouse.y
-  //   ) {
-  //     return false;
-  //   }
-  // }
-
   getCanvasSize = () => {
     const { width, height } = this.wrap.getBoundingClientRect();
     this.setState({
@@ -79,60 +78,81 @@ class App extends Component {
   };
 
   mouseMove = e => {
-    if (this.state.tick === 2) {
+    if (this.state.tick === 0) {
       this.setState({ mouse: { x: e.clientX, y: e.clientY } });
     }
   };
 
   render() {
-    const { option, mouse, dimensions, orient } = this.state;
+    const { option, mouse, dimensions, orient, mobile } = this.state;
 
-    const color = option === "1" ? whiteBG : option === "2" ? blackBG : whiteBG;
+    const color = option === "1" ? blackBG : option === "2" ? whiteBG : goldBG;
     return (
       <div style={{ ...backgroundWrap, ...color }}>
-        <div id="canvas-wrap" ref={el => (this.wrap = el)}>
-          {option === "1" ? (
-            <SimpleSleek mouse={mouse} dimensions={dimensions} />
-          ) : option === "2" ? (
-            <FattyGlitch mouse={mouse} dimensions={dimensions} />
-          ) : option === "3" ? (
-            <PureGold mouse={mouse} dimensions={dimensions} />
-          ) : null}
-        </div>
-        <form>
-          <fieldset>
-            <h3>Three.js Demo</h3>
-            <h5>{orient.alpha}</h5>
-            <h5>{orient.beta}</h5>
-            <h5>{orient.gamma}</h5>
-            <input
-              type="radio"
-              name="options"
-              value="1"
-              onChange={this.changeOption}
-              checked={option === "1"}
-            />
-            <label htmlFor="1">1</label>
+        {mobile ? (
+          <div style={{ color: "#fff", fontSize: "2em", width: "80%" }}>
+            This demo is not available on mobile (smart phones aren't quite
+            smart enough yet). :)
+          </div>
+        ) : (
+          <React.Fragment>
+            <div id="canvas-wrap" ref={el => (this.wrap = el)}>
+              {option === "2" ? (
+                <SimpleSleek
+                  mouse={mouse}
+                  dimensions={dimensions}
+                  orient={orient}
+                  mobile={mobile}
+                />
+              ) : option === "1" ? (
+                <FattyGlitch
+                  mouse={mouse}
+                  dimensions={dimensions}
+                  orient={orient}
+                  mobile={mobile}
+                />
+              ) : option === "3" ? (
+                <PureGold
+                  mouse={mouse}
+                  dimensions={dimensions}
+                  orient={orient}
+                  mobile={mobile}
+                />
+              ) : null}
+            </div>
+            <form>
+              <fieldset>
+                <h3>Three.js Demo</h3>
+                <input
+                  type="radio"
+                  name="options"
+                  value="1"
+                  onChange={this.changeOption}
+                  checked={option === "1"}
+                />
+                <label htmlFor="1">1</label>
 
-            <input
-              type="radio"
-              name="options"
-              value="2"
-              onChange={this.changeOption}
-              checked={option === "2"}
-            />
-            <label htmlFor="2">2</label>
+                <input
+                  type="radio"
+                  name="options"
+                  value="2"
+                  onChange={this.changeOption}
+                  checked={option === "2"}
+                />
+                <label htmlFor="2">2</label>
 
-            <input
-              type="radio"
-              name="options"
-              value="3"
-              onChange={this.changeOption}
-              checked={option === "3"}
-            />
-            <label htmlFor="3">3</label>
-          </fieldset>
-        </form>
+                <input
+                  type="radio"
+                  name="options"
+                  value="3"
+                  onChange={this.changeOption}
+                  checked={option === "3"}
+                />
+                <label htmlFor="3">3</label>
+              </fieldset>
+            </form>
+          </React.Fragment>
+        )}
       </div>
     );
   }
@@ -148,7 +168,7 @@ const backgroundWrap = {
 };
 
 const blackBG = {
-  background: "radial-gradient(transparent, black 90%), #298484"
+  background: "radial-gradient(transparent, black 90%), #0b4b4f"
 };
 
 const whiteBG = {
@@ -156,7 +176,10 @@ const whiteBG = {
 };
 
 const goldBG = {
-  background: "#fcdd2f",
+  // background: "#fcdd2f",
+  background: "url('assets/img/sunset.jpg')",
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "cover",
   boxShadow: "inset 0 0 20vmax black"
 };
 

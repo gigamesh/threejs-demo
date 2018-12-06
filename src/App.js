@@ -85,7 +85,7 @@ class App extends Component {
   };
 
   render() {
-    const { option, mouse, dimensions } = this.state;
+    const { option, mouse, dimensions, tick } = this.state;
 
     const color = option === "1" ? whiteBG : option === "2" ? blackBG : goldBG;
     return (

@@ -12,7 +12,7 @@ class App extends Component {
     mouse: { x: 200, y: 200 },
     dimensions: { width: 0, height: 0 },
     orient: {},
-    tick: false
+    tick: 0
   };
 
   componentDidMount() {
@@ -26,24 +26,28 @@ class App extends Component {
       );
     }
     this.getCanvasSize();
+    this.nextFrame();
   }
 
-  orientationHandler = e => {
-    if (this.state.tick) {
-      this.setState({
-        orient: {
-          alpha: e.alpha,
-          beta: e.beta,
-          gamma: e.gamma
-        },
-        tick: false
-      });
-    }
-    requestAnimationFrame(this.nextFrame);
-  };
+  // orientationHandler = e => {
+  //   if (this.state.tick) {
+  //     this.setState({
+  //       orient: {
+  //         alpha: e.alpha,
+  //         beta: e.beta,
+  //         gamma: e.gamma
+  //       },
+  //       tick: 0
+  //     });
+  //   }
+  //   requestAnimationFrame(this.nextFrame);
+  // };
 
   nextFrame = () => {
-    this.setState({ tick: true });
+    this.setState(prevState => ({
+      tick: prevState.tick === 2 ? 0 : ++prevState.tick
+    }));
+    requestAnimationFrame(this.nextFrame);
   };
 
   componentWillUnmount() {
@@ -51,9 +55,17 @@ class App extends Component {
     window.removeEventListener("mousemove", () => this.mouseMove);
   }
 
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   if (
+  //     nextState.mouse.x === this.props.mouse.x ||
+  //     nextState.mouse.y === this.props.mouse.y
+  //   ) {
+  //     return false;
+  //   }
+  // }
+
   getCanvasSize = () => {
     const { width, height } = this.wrap.getBoundingClientRect();
-    // console.log("getCanvasSize", width, height);
     this.setState({
       dimensions: {
         width,
@@ -67,13 +79,14 @@ class App extends Component {
   };
 
   mouseMove = e => {
-    if (this.state.tick) {
+    if (this.state.tick === 2) {
       this.setState({ mouse: { x: e.clientX, y: e.clientY } });
     }
   };
 
   render() {
-    const { option, mouse, dimensions, orient } = this.state;
+    const { option, mouse, dimensions } = this.state;
+
     const color = option === "1" ? whiteBG : option === "2" ? blackBG : goldBG;
     return (
       <div style={{ ...backgroundWrap, ...color }}>

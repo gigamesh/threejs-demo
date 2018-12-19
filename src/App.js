@@ -89,70 +89,63 @@ class App extends Component {
     const color = option === "1" ? blackBG : option === "2" ? whiteBG : goldBG;
     return (
       <div style={{ ...backgroundWrap, ...color }}>
-        {mobile ? (
-          <div style={{ color: "#fff", fontSize: "2em", width: "80%" }}>
-            This demo is not available on mobile (smart phones aren't quite
-            smart enough yet). :)
+        <React.Fragment>
+          <div id="canvas-wrap" ref={el => (this.wrap = el)}>
+            {option === "2" ? (
+              <SimpleSleek
+                mouse={mouse}
+                dimensions={dimensions}
+                orient={orient}
+                mobile={mobile}
+              />
+            ) : option === "1" ? (
+              <FattyGlitch
+                mouse={mouse}
+                dimensions={dimensions}
+                orient={orient}
+                mobile={mobile}
+              />
+            ) : option === "3" ? (
+              <PureGold
+                mouse={mouse}
+                dimensions={dimensions}
+                orient={orient}
+                mobile={mobile}
+              />
+            ) : null}
           </div>
-        ) : (
-          <React.Fragment>
-            <div id="canvas-wrap" ref={el => (this.wrap = el)}>
-              {option === "2" ? (
-                <SimpleSleek
-                  mouse={mouse}
-                  dimensions={dimensions}
-                  orient={orient}
-                  mobile={mobile}
-                />
-              ) : option === "1" ? (
-                <FattyGlitch
-                  mouse={mouse}
-                  dimensions={dimensions}
-                  orient={orient}
-                  mobile={mobile}
-                />
-              ) : option === "3" ? (
-                <PureGold
-                  mouse={mouse}
-                  dimensions={dimensions}
-                  orient={orient}
-                  mobile={mobile}
-                />
-              ) : null}
-            </div>
-            <form>
-              <fieldset>
-                <h3>Three.js Demo</h3>
-                <input
-                  type="radio"
-                  name="options"
-                  value="1"
-                  onChange={this.changeOption}
-                  checked={option === "1"}
-                />
-                <label htmlFor="1">1</label>
+          <form>
+            <fieldset>
+              <h3>Three.js Demo</h3>
+              <input
+                type="radio"
+                name="options"
+                value="1"
+                onChange={this.changeOption}
+                checked={option === "1"}
+              />
+              <label htmlFor="1">1</label>
 
-                <input
-                  type="radio"
-                  name="options"
-                  value="2"
-                  onChange={this.changeOption}
-                  checked={option === "2"}
-                />
-                <label htmlFor="2">2</label>
+              <input
+                type="radio"
+                name="options"
+                value="2"
+                onChange={this.changeOption}
+                checked={option === "2"}
+              />
+              <label htmlFor="2">2</label>
 
-                <input
-                  type="radio"
-                  name="options"
-                  value="3"
-                  onChange={this.changeOption}
-                  checked={option === "3"}
-                />
-                <label htmlFor="3">3</label>
-              </fieldset>
-            </form>
-          </React.Fragment>
-        )}
+              <input
+                type="radio"
+                name="options"
+                value="3"
+                onChange={this.changeOption}
+                checked={option === "3"}
+              />
+              <label htmlFor="3">3</label>
+            </fieldset>
+          </form>
+        </React.Fragment>
       </div>
     );
   }

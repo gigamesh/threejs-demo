@@ -7,7 +7,8 @@ class PureGold extends Component {
   state = {
     rX: 0,
     rY: 0,
-    testX: 0
+    testX: 0,
+    opacity: 0
   };
 
   componentDidMount() {
@@ -55,14 +56,19 @@ class PureGold extends Component {
     const font = fontLoader.parse(fontJSON);
 
     const textureloader = new THREE.CubeTextureLoader();
-    this.textureCube = textureloader.load([
-      "assets/img/skyboxsun5deg2/pos-x.jpg",
-      "assets/img/skyboxsun5deg2/neg-x.jpg",
-      "assets/img/skyboxsun5deg2/pos-y.jpg",
-      "assets/img/skyboxsun5deg2/neg-y.jpg",
-      "assets/img/skyboxsun5deg2/pos-z.jpg",
-      "assets/img/skyboxsun5deg2/neg-z.jpg"
-    ]);
+    this.textureCube = textureloader.load(
+      [
+        "assets/img/skyboxsun5deg2/pos-x.jpg",
+        "assets/img/skyboxsun5deg2/neg-x.jpg",
+        "assets/img/skyboxsun5deg2/pos-y.jpg",
+        "assets/img/skyboxsun5deg2/neg-y.jpg",
+        "assets/img/skyboxsun5deg2/pos-z.jpg",
+        "assets/img/skyboxsun5deg2/neg-z.jpg"
+      ],
+      () => {
+        this.setState({ opacity: 1 });
+      }
+    );
 
     const geometry = new THREE.TextGeometry("PURE GOLD BABY!", {
       font,
@@ -127,6 +133,10 @@ class PureGold extends Component {
     }
   }
 
+  canvasLoaded = () => {
+    this.setState({ opacity: 1 });
+  };
+
   delta = 0;
   animate = () => {
     this.mesh.rotation.y = this.state.rX;
@@ -141,7 +151,10 @@ class PureGold extends Component {
 
     return (
       <React.Fragment>
-        <canvas ref={el => (this.canvas = el)} />
+        <canvas
+          ref={el => (this.canvas = el)}
+          style={{ opacity: this.state.opacity, transition: "2s opacity" }}
+        />
         {mobile && (
           <div>
             <h5>beta: {orient.beta}</h5>

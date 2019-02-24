@@ -10,10 +10,11 @@ class App extends Component {
   state = {
     option: "1",
     mouse: { x: 200, y: 200 },
-    dimensions: { width: 0, height: 0 },
     orient: {},
     tick: 0,
-    mobile: false
+    mobile: false,
+    wrapWidth: 0,
+    wrapHeight: 0
   };
 
   componentDidMount() {
@@ -65,12 +66,15 @@ class App extends Component {
 
   getCanvasSize = () => {
     const { width, height } = this.wrap.getBoundingClientRect();
-    this.setState({
-      dimensions: {
-        width,
-        height
-      }
-    });
+
+    // timer to defer setting new dimensions until resizing has stopped
+    clearTimeout(resizeTimer);
+    const resizeTimer = setTimeout(() => {
+      this.setState({
+        wrapHeight: height,
+        wrapWidth: width
+      });
+    }, 250);
   };
 
   changeOption = e => {
@@ -84,68 +88,71 @@ class App extends Component {
   };
 
   render() {
-    const { option, mouse, dimensions, orient, mobile } = this.state;
+    const { option, mouse, orient, mobile, wrapHeight, wrapWidth } = this.state;
+    console.log("rendered!");
 
     const color = option === "1" ? blackBG : option === "2" ? whiteBG : goldBG;
     return (
       <div style={{ ...backgroundWrap, ...color }}>
-        <React.Fragment>
-          <div id="canvas-wrap" ref={el => (this.wrap = el)}>
-            {option === "2" ? (
-              <SimpleSleek
-                mouse={mouse}
-                dimensions={dimensions}
-                orient={orient}
-                mobile={mobile}
-              />
-            ) : option === "1" ? (
-              <FattyGlitch
-                mouse={mouse}
-                dimensions={dimensions}
-                orient={orient}
-                mobile={mobile}
-              />
-            ) : option === "3" ? (
-              <PureGold
-                mouse={mouse}
-                dimensions={dimensions}
-                orient={orient}
-                mobile={mobile}
-              />
-            ) : null}
-          </div>
-          <form>
-            <fieldset>
-              <h3>Three.js Demo</h3>
-              <input
-                type="radio"
-                name="options"
-                value="1"
-                onChange={this.changeOption}
-                checked={option === "1"}
-              />
-              <label htmlFor="1">1</label>
+        <div id="canvas-wrap" ref={el => (this.wrap = el)}>
+          {wrapHeight && wrapWidth && (
+            <React.Fragment>
+              {option === "1" ? (
+                <FattyGlitch
+                  mouse={mouse}
+                  dimensions={{ wrapWidth, wrapHeight }}
+                  orient={orient}
+                  mobile={mobile}
+                />
+              ) : option === "2" ? (
+                <SimpleSleek
+                  mouse={mouse}
+                  dimensions={{ wrapWidth, wrapHeight }}
+                  orient={orient}
+                  mobile={mobile}
+                />
+              ) : option === "3" ? (
+                <PureGold
+                  mouse={mouse}
+                  dimensions={{ wrapWidth, wrapHeight }}
+                  orient={orient}
+                  mobile={mobile}
+                />
+              ) : null}
+            </React.Fragment>
+          )}
+        </div>
+        <form>
+          <fieldset>
+            <h3>Three.js Demo</h3>
+            <input
+              type="radio"
+              name="options"
+              value="1"
+              onChange={this.changeOption}
+              checked={option === "1"}
+            />
+            <label htmlFor="1">1</label>
 
-              <input
-                type="radio"
-                name="options"
-                value="2"
-                onChange={this.changeOption}
-                checked={option === "2"}
-              />
-              <label htmlFor="2">2</label>
+            <input
+              type="radio"
+              name="options"
+              value="2"
+              onChange={this.changeOption}
+              checked={option === "2"}
+            />
+            <label htmlFor="2">2</label>
 
-              <input
-                type="radio"
-                name="options"
-                value="3"
-                onChange={this.changeOption}
-                checked={option === "3"}
-              />
-              <label htmlFor="3">3</label>
-            </fieldset>
-          </form>
-        </React.Fragment>
+            <input
+              type="radio"
+              name="options"
+              value="3"
+              onChange={this.changeOption}
+              checked={option === "3"}
+            />
+            <label htmlFor="3">3</label>
+          </fieldset>
+        </form>
       </div>
     );
   }

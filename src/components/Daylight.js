@@ -14,8 +14,8 @@ class SimpleSleek extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      prevProps.dimensions.width !== this.props.dimensions.width ||
-      prevProps.dimensions.height !== this.props.dimensions.height
+      prevProps.wrapWidth !== this.props.wrapWidth ||
+      prevProps.wrapHeight !== this.props.wrapHeight
     ) {
       this.repaint();
     }
@@ -25,19 +25,24 @@ class SimpleSleek extends Component {
   }
 
   repaint = () => {
-    const { width, height } = this.props.dimensions;
+    const { wrapWidth, wrapHeight } = this.props.dimensions;
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true
     });
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(wrapWidth, wrapHeight);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
     ////////////// CAMERA
-    this.camera = new THREE.PerspectiveCamera(50, width / height, 1, 1000);
+    this.camera = new THREE.PerspectiveCamera(
+      50,
+      wrapWidth / wrapHeight,
+      1,
+      1000
+    );
     this.camera.position.set(0, 0, 200);
 
     ///////////// SCENE
@@ -120,13 +125,6 @@ class SimpleSleek extends Component {
       scene.add(planeMesh);
       scene.add(group);
     });
-
-    ////////////// CONTROLS
-    // var controls = new THREE.OrbitControls(
-    //   this.camera,
-    //   this.renderer.domElement
-    // );
-    // controls.screenSpacePanning = true;
 
     this.animate();
   };

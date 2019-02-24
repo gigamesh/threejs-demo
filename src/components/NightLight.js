@@ -12,16 +12,18 @@ export default class FattyGlitch extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    const { wrapHeight, wrapWidth } = this.props.dimensions;
     if (
-      prevProps.dimensions.width !== this.props.dimensions.width ||
-      prevProps.dimensions.height !== this.props.dimensions.height
+      prevProps.dimensions.wrapWidth !== wrapWidth ||
+      prevProps.dimensions.wrapHeight !== wrapHeight
     ) {
       this.repaint();
     }
   }
 
   repaint() {
-    const { width, height } = this.props.dimensions;
+    console.log("repainting...");
+    const { wrapWidth, wrapHeight } = this.props.dimensions;
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
@@ -30,9 +32,14 @@ export default class FattyGlitch extends Component {
     const renderer = this.renderer;
     renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(width, height);
+    renderer.setSize(wrapWidth, wrapHeight);
 
-    this.camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 3000);
+    this.camera = new THREE.PerspectiveCamera(
+      35,
+      wrapWidth / wrapHeight,
+      0.1,
+      3000
+    );
     this.scene = new THREE.Scene();
     const scene = this.scene;
 
@@ -100,6 +107,7 @@ export default class FattyGlitch extends Component {
       this.props.mouse.y - 300,
       -100
     );
+    // console.log(this.mesh.rotation.y);
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.animate);
   };

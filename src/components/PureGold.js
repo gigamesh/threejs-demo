@@ -16,8 +16,8 @@ class PureGold extends Component {
   }
   componentDidUpdate(prevProps) {
     if (
-      prevProps.dimensions.width !== this.props.dimensions.width ||
-      prevProps.dimensions.height !== this.props.dimensions.height
+      prevProps.wrapWidth !== this.props.wrapWidth ||
+      prevProps.wrapHeight !== this.props.wrapHeight
     ) {
       this.repaint();
     }
@@ -30,7 +30,7 @@ class PureGold extends Component {
     }
   }
   repaint = () => {
-    const { width, height } = this.props.dimensions;
+    const { wrapWidth, wrapHeight } = this.props.dimensions;
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -40,12 +40,17 @@ class PureGold extends Component {
     const renderer = this.renderer;
     renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(width, height);
+    renderer.setSize(wrapWidth, wrapHeight);
 
-    this.camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 3000);
+    this.camera = new THREE.PerspectiveCamera(
+      35,
+      wrapWidth / wrapHeight,
+      0.1,
+      3000
+    );
     this.cameraCube = new THREE.PerspectiveCamera(
       35,
-      width / height,
+      wrapWidth / wrapHeight,
       0.1,
       3000
     );

@@ -14,10 +14,12 @@ class PureGold extends Component {
   componentDidMount() {
     this.repaint();
   }
+
   componentDidUpdate(prevProps) {
+    const { wrapHeight, wrapWidth } = this.props.dimensions;
     if (
-      prevProps.wrapWidth !== this.props.wrapWidth ||
-      prevProps.wrapHeight !== this.props.wrapHeight
+      prevProps.dimensions.wrapWidth !== wrapWidth ||
+      prevProps.dimensions.wrapHeight !== wrapHeight
     ) {
       this.repaint();
     }
@@ -29,6 +31,7 @@ class PureGold extends Component {
       this.getRotation();
     }
   }
+
   repaint = () => {
     const { wrapWidth, wrapHeight } = this.props.dimensions;
 
@@ -94,7 +97,7 @@ class PureGold extends Component {
       roughness: 0,
       reflectivity: 1,
       envMap: this.textureCube,
-      envMapIntensity: 1.8
+      envMapIntensity: 1.5
     });
     this.mesh = new THREE.Mesh(geometry, this.material);
     this.mesh.position.set(-20, -20, -350);
@@ -142,11 +145,9 @@ class PureGold extends Component {
     this.setState({ opacity: 1 });
   };
 
-  delta = 0;
   animate = () => {
     this.mesh.rotation.y = this.state.rX;
     this.mesh.rotation.x = this.state.rY;
-    // this.scene.background = this.textureCube;
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.animate);
   };

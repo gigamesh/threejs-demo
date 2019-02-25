@@ -11,7 +11,6 @@ class App extends Component {
     option: "1",
     mouse: { x: 200, y: 200 },
     orient: {},
-    tick: 0,
     mobile: false,
     wrapWidth: 0,
     wrapHeight: 0
@@ -35,28 +34,16 @@ class App extends Component {
       );
     }
     this.getCanvasSize();
-    this.nextFrame();
   }
 
   orientationHandler = e => {
-    if (this.state.tick === 0) {
-      this.setState({
-        orient: {
-          alpha: e.alpha,
-          beta: e.beta,
-          gamma: e.gamma
-        },
-        tick: 0
-      });
-    }
-    requestAnimationFrame(this.nextFrame);
-  };
-
-  nextFrame = () => {
-    this.setState(prevState => ({
-      tick: prevState.tick === 2 ? 0 : ++prevState.tick
-    }));
-    requestAnimationFrame(this.nextFrame);
+    this.setState({
+      orient: {
+        alpha: e.alpha,
+        beta: e.beta,
+        gamma: e.gamma
+      }
+    });
   };
 
   componentWillUnmount() {
@@ -68,13 +55,12 @@ class App extends Component {
     const { width, height } = this.wrap.getBoundingClientRect();
 
     // timer to defer setting new dimensions until resizing has stopped
-    clearTimeout(resizeTimer);
-    const resizeTimer = setTimeout(() => {
+    setTimeout(() => {
       this.setState({
         wrapHeight: height,
         wrapWidth: width
       });
-    }, 250);
+    }, 0);
   };
 
   changeOption = e => {
@@ -82,14 +68,11 @@ class App extends Component {
   };
 
   mouseMove = e => {
-    if (this.state.tick === 0) {
-      this.setState({ mouse: { x: e.clientX, y: e.clientY } });
-    }
+    this.setState({ mouse: { x: e.clientX, y: e.clientY } });
   };
 
   render() {
     const { option, mouse, orient, mobile, wrapHeight, wrapWidth } = this.state;
-    console.log("rendered!");
 
     const color = option === "1" ? blackBG : option === "2" ? whiteBG : goldBG;
     return (
@@ -168,7 +151,8 @@ const backgroundWrap = {
 };
 
 const blackBG = {
-  background: "radial-gradient(transparent, black 90%), #0b4b4f"
+  background:
+    "url(http://pluspng.com/img-png/stars-png-stars-png-image-png-image-1550.png), radial-gradient(transparent, black 90%), #032426"
 };
 
 const whiteBG = {
@@ -176,8 +160,7 @@ const whiteBG = {
 };
 
 const goldBG = {
-  // background: "#fcdd2f",
-  background: "url('assets/img/sunset.jpg')",
+  background: "url(assets/img/sunset.jpg)",
   backgroundRepeat: "no-repeat",
   backgroundSize: "cover",
   boxShadow: "inset 0 0 20vmax black"

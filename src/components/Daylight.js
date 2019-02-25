@@ -13,9 +13,10 @@ class SimpleSleek extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    const { wrapHeight, wrapWidth } = this.props.dimensions;
     if (
-      prevProps.wrapWidth !== this.props.wrapWidth ||
-      prevProps.wrapHeight !== this.props.wrapHeight
+      prevProps.dimensions.wrapWidth !== wrapWidth ||
+      prevProps.dimensions.wrapHeight !== wrapHeight
     ) {
       this.repaint();
     }

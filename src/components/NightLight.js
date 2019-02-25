@@ -9,6 +9,8 @@ export default class FattyGlitch extends Component {
 
   componentDidMount() {
     this.repaint();
+    requestAnimationFrame(this.animate);
+    this.glitchTimer = setInterval(this.glitch, 4000);
   }
 
   componentDidUpdate(prevProps) {
@@ -22,7 +24,6 @@ export default class FattyGlitch extends Component {
   }
 
   repaint() {
-    console.log("repainting...");
     const { wrapWidth, wrapHeight } = this.props.dimensions;
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -63,7 +64,7 @@ export default class FattyGlitch extends Component {
       material: 10
     });
 
-    geometry.translate(-240, 0, 0);
+    geometry.translate(-245, 0, 0);
     geometry.rotateX(-0.2);
     this.material = new THREE.MeshPhysicalMaterial({
       color: 0x43f9f9,
@@ -79,10 +80,6 @@ export default class FattyGlitch extends Component {
     mesh.position.set(0, -30, -300);
 
     scene.add(mesh);
-
-    requestAnimationFrame(this.animate);
-
-    this.glitchTimer = setInterval(this.glitch, 4000);
   }
 
   glitch = () => {

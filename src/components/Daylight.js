@@ -2,12 +2,12 @@ import React, { Component } from "react";
 
 var THREE = (window.THREE = require("three"));
 require("three/examples/js/loaders/SVGLoader");
-require("three/examples/js/controls/OrbitControls");
 
-class SimpleSleek extends Component {
+class DayLight extends Component {
   state = {
     lightPos: { x: 450, y: 700 }
   };
+
   componentDidMount() {
     this.repaint();
   }
@@ -51,11 +51,6 @@ class SimpleSleek extends Component {
     const { scene } = this;
     this.scene.background = new THREE.Color(0xffffff);
 
-    var helper = new THREE.GridHelper(160, 10, 0xcccccc, 0xcccccc);
-    helper.rotation.x = Math.PI / 2;
-
-    // this.scene.add(helper);
-
     /////////// LIGHTS
     const light1 = new THREE.AmbientLight(0xffffff, 0.9);
     scene.add(light1);
@@ -71,12 +66,9 @@ class SimpleSleek extends Component {
     const light3 = new THREE.HemisphereLight(0xffffff, 0x000000, 1.8);
     scene.add(light3);
 
-    // var lightHelper = new THREE.PointLightHelper(light2, 20, 0x444444);
-    // scene.add(lightHelper);
-
     //////////// LOADER
     var loader = new THREE.SVGLoader();
-    loader.load("assets/svg/daylight1a.svg", function(paths) {
+    loader.load("assets/svg/daylight1a.svg", paths => {
       var group = new THREE.Group();
       group.scale.multiplyScalar(0.57);
       group.position.x = -308;
@@ -125,9 +117,9 @@ class SimpleSleek extends Component {
       planeMesh.receiveShadow = true;
       scene.add(planeMesh);
       scene.add(group);
-    });
 
-    this.animate();
+      this.animate();
+    });
   };
 
   getLightPosition() {
@@ -158,18 +150,22 @@ class SimpleSleek extends Component {
   }
 
   animate = () => {
-    requestAnimationFrame(this.animate);
-    this.light2.position.set(
-      this.state.lightPos.x - 900,
-      -this.state.lightPos.y + 800,
-      200
-    );
-    this.renderer.render(this.scene, this.camera);
+    setTimeout(() => {
+      requestAnimationFrame(this.animate);
+      this.light2.position.set(
+        this.state.lightPos.x - 900,
+        -this.state.lightPos.y + 800,
+        200
+      );
+      this.renderer.render(this.scene, this.camera);
+    }, 1000 / this.props.fps);
   };
 
   render() {
-    return <canvas ref={el => (this.canvas = el)} />;
+    return (
+      <canvas ref={el => (this.canvas = el)} style={{ background: "#fff" }} />
+    );
   }
 }
 
-export default SimpleSleek;
+export default DayLight;

@@ -1,12 +1,13 @@
 import React, { Component } from "react";
-import SimpleSleek from "./components/Daylight";
-import FattyGlitch from "./components/NightLight";
+import DayLight from "./components/DayLight";
+import NightLight from "./components/NightLight";
 import PureGold from "./components/PureGold";
 
 require("three/examples/js/loaders/SVGLoader");
 require("three/examples/js/controls/OrbitControls");
 
 class App extends Component {
+  fps = 30;
   state = {
     option: "1",
     mouse: { x: 200, y: 200 },
@@ -75,24 +76,27 @@ class App extends Component {
     const { option, mouse, orient, mobile, wrapHeight, wrapWidth } = this.state;
 
     const color = option === "1" ? blackBG : option === "2" ? whiteBG : goldBG;
+
     return (
       <div style={{ ...backgroundWrap, ...color }}>
         <div id="canvas-wrap" ref={el => (this.wrap = el)}>
           {wrapHeight && wrapWidth && (
             <React.Fragment>
               {option === "1" ? (
-                <FattyGlitch
+                <NightLight
                   mouse={mouse}
                   dimensions={{ wrapWidth, wrapHeight }}
                   orient={orient}
                   mobile={mobile}
+                  fps={this.fps}
                 />
               ) : option === "2" ? (
-                <SimpleSleek
+                <DayLight
                   mouse={mouse}
                   dimensions={{ wrapWidth, wrapHeight }}
                   orient={orient}
                   mobile={mobile}
+                  fps={this.fps}
                 />
               ) : option === "3" ? (
                 <PureGold
@@ -100,6 +104,7 @@ class App extends Component {
                   dimensions={{ wrapWidth, wrapHeight }}
                   orient={orient}
                   mobile={mobile}
+                  fps={this.fps}
                 />
               ) : null}
             </React.Fragment>
@@ -108,32 +113,18 @@ class App extends Component {
         <form>
           <fieldset>
             <h3>Three.js Demo</h3>
-            <input
-              type="radio"
-              name="options"
-              value="1"
-              onChange={this.changeOption}
-              checked={option === "1"}
-            />
-            <label htmlFor="1">1</label>
-
-            <input
-              type="radio"
-              name="options"
-              value="2"
-              onChange={this.changeOption}
-              checked={option === "2"}
-            />
-            <label htmlFor="2">2</label>
-
-            <input
-              type="radio"
-              name="options"
-              value="3"
-              onChange={this.changeOption}
-              checked={option === "3"}
-            />
-            <label htmlFor="3">3</label>
+            {["1", "2", "3"].map(current => (
+              <React.Fragment>
+                <input
+                  type="radio"
+                  name="options"
+                  value={current}
+                  onChange={this.changeOption}
+                  checked={this.state.option === current}
+                />
+                <label htmlFor={current}>{current}</label>
+              </React.Fragment>
+            ))}
           </fieldset>
         </form>
       </div>

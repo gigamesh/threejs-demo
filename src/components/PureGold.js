@@ -146,10 +146,12 @@ class PureGold extends Component {
   };
 
   animate = () => {
-    this.mesh.rotation.y = this.state.rX;
-    this.mesh.rotation.x = this.state.rY;
-    this.renderer.render(this.scene, this.camera);
-    requestAnimationFrame(this.animate);
+    setTimeout(() => {
+      this.mesh.rotation.y = this.state.rX;
+      this.mesh.rotation.x = this.state.rY;
+      this.renderer.render(this.scene, this.camera);
+      requestAnimationFrame(this.animate);
+    }, 1000 / this.props.fps);
   };
 
   render() {

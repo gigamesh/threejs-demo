@@ -97,16 +97,18 @@ export default class FattyGlitch extends Component {
 
   delta = 0;
   animate = () => {
-    let wave = Math.sin((this.delta += 0.02));
-    this.mesh.rotation.y += wave * 0.0005;
-    this.light2.position.set(
-      this.props.mouse.x - 800,
-      this.props.mouse.y - 300,
-      -100
-    );
-    // console.log(this.mesh.rotation.y);
-    this.renderer.render(this.scene, this.camera);
-    requestAnimationFrame(this.animate);
+    setTimeout(() => {
+      let wave = Math.sin((this.delta += 0.02));
+      this.mesh.rotation.y += wave * 0.0005;
+      this.light2.position.set(
+        this.props.mouse.x - 800,
+        this.props.mouse.y - 300,
+        -100
+      );
+      // console.log(this.mesh.rotation.y);
+      this.renderer.render(this.scene, this.camera);
+      requestAnimationFrame(this.animate);
+    }, 1000 / this.props.fps);
   };
 
   mouseMove = e => {
@@ -121,7 +123,6 @@ export default class FattyGlitch extends Component {
         ref={el => (this.canvas = el)}
         onMouseMove={this.props.mouseMove}
       />
-      // </div>
     );
   }
 }

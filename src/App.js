@@ -75,7 +75,7 @@ class App extends Component {
   render() {
     const { option, mouse, orient, mobile, wrapHeight, wrapWidth } = this.state;
 
-    const color = option === "1" ? blackBG : option === "2" ? whiteBG : goldBG;
+    const color = option === "3" ? goldBG : whiteBG;
 
     return (
       <div style={{ ...backgroundWrap, ...color }}>
@@ -83,7 +83,7 @@ class App extends Component {
           {wrapHeight && wrapWidth && (
             <React.Fragment>
               {option === "1" ? (
-                <NightLight
+                <DayLight
                   mouse={mouse}
                   dimensions={{ wrapWidth, wrapHeight }}
                   orient={orient}
@@ -91,7 +91,7 @@ class App extends Component {
                   fps={this.fps}
                 />
               ) : option === "2" ? (
-                <DayLight
+                <NightLight
                   mouse={mouse}
                   dimensions={{ wrapWidth, wrapHeight }}
                   orient={orient}

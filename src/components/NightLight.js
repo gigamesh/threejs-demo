@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 const THREE = require("three");
-const fontJSON = require("../helvetiker_bold.typeface.json");
+const fontJSON = require("../helvetiker_bold.typeface.json.js");
 
-export default class FattyGlitch extends Component {
+export default class NightLight extends Component {
   state = {
     wireframe: false
   };
@@ -56,15 +56,15 @@ export default class FattyGlitch extends Component {
     const loader = new THREE.FontLoader();
     const font = loader.parse(fontJSON);
 
-    const geometry = new THREE.TextGeometry("NIGHT LIGHT", {
+    const geometry = new THREE.TextGeometry("Left Field Labs", {
       font,
-      size: 60,
+      size: 25,
       height: 20,
       bevelThickness: 20,
       material: 10
     });
 
-    geometry.translate(-245, 0, 0);
+    geometry.translate(-115, 20, 0);
     geometry.rotateX(-0.2);
     this.material = new THREE.MeshPhysicalMaterial({
       color: 0x43f9f9,

@@ -1,6 +1,8 @@
 import React, { Component } from "react";
+import loadLogo from './loadLogo'
 
-var THREE = (window.THREE = require("three"));
+const THREE = (window.THREE = require("three"));
+
 require("three/examples/js/loaders/SVGLoader");
 
 class DayLight extends Component {
@@ -67,51 +69,42 @@ class DayLight extends Component {
     scene.add(light3);
 
     //////////// LOADER
-    var loader = new THREE.SVGLoader();
-    loader.load("assets/svg/daylight1a.svg", paths => {
-      var group = new THREE.Group();
-      group.scale.multiplyScalar(0.57);
-      group.position.x = -308;
-      group.position.y = 60;
-      group.scale.y *= -1;
+    loadLogo((group, paths) => {
+      paths.forEach((path) => {
 
-      for (var i = 0; i < paths.length; i++) {
-        var path = paths[i];
-
-        var textMaterial = new THREE.MeshStandardMaterial({
-          color: 0xe2d258,
+        const textMaterial = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
           roughness: 0.2,
           metalness: 0.53
         });
 
-        var shapes = path.toShapes(true);
+        const shapes = path.toShapes(true);
 
-        for (var j = 0; j < shapes.length; j++) {
-          var shape = shapes[j];
-          var extrudeSettings = {
+        shapes.forEach((shape) => {
+          const extrudeSettings = {
             steps: 2,
             depth: 10,
             bevelEnabled: true,
-            bevelThickness: 1,
-            bevelSize: 1,
+            bevelThickness: .5,
+            bevelSize: .5,
             bevelSegments: 1,
             curveSegments: 40
           };
-          var geometry = new THREE.ExtrudeBufferGeometry(
+          const geometry = new THREE.ExtrudeBufferGeometry(
             shape,
             extrudeSettings
           );
-          var mesh = new THREE.Mesh(geometry, textMaterial);
+          const mesh = new THREE.Mesh(geometry, textMaterial);
           mesh.castShadow = true;
           mesh.receiveShadow = true;
 
           group.add(mesh);
-        }
-      }
+        })
+      })
 
       const planeGeo = new THREE.PlaneGeometry(4000, 4000, 100, 100);
       const planeMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff
+        color: 0xccccda
       });
       const planeMesh = new THREE.Mesh(planeGeo, planeMaterial);
       planeMesh.receiveShadow = true;
@@ -119,7 +112,7 @@ class DayLight extends Component {
       scene.add(group);
 
       this.animate();
-    });
+    })
   };
 
   getLightPosition() {
@@ -143,7 +136,7 @@ class DayLight extends Component {
     function convertRange(value, range1, range2) {
       return (
         ((value - range1[0]) * (range2[1] - range2[0])) /
-          (range1[1] - range1[0]) +
+        (range1[1] - range1[0]) +
         range2[0]
       );
     }

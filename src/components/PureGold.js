@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-const fontJSON = require("../helvetiker_bold.typeface.json");
+const fontJSON = require("../helvetiker_bold.typeface.json.js");
 const THREE = require("three");
 
 class PureGold extends Component {
@@ -78,18 +78,18 @@ class PureGold extends Component {
       }
     );
 
-    const geometry = new THREE.TextGeometry("PURE GOLD BABY!", {
+    const geometry = new THREE.TextGeometry("Left Field Labs", {
       font,
-      size: 50,
+      size: 28,
       height: 10,
       curveSegments: 20,
       bevelEnabled: true,
-      bevelThickness: 1,
-      bevelSize: 1,
+      bevelThickness: .5,
+      bevelSize: .5,
       bevelSegments: 1
     });
 
-    geometry.translate(-280, 0, 0);
+    geometry.translate(-115, 20, 0);
 
     this.material = new THREE.MeshStandardMaterial({
       color: 0xf7da4c,
@@ -135,7 +135,7 @@ class PureGold extends Component {
     function convertRange(value, range1, range2) {
       return (
         ((value - range1[0]) * (range2[1] - range2[0])) /
-          (range1[1] - range1[0]) +
+        (range1[1] - range1[0]) +
         range2[0]
       );
     }
